@@ -39,3 +39,12 @@ padding:20px;
 background:#000;
 font-size:14px;
 }
+
+.dog{
+position:fixed;
+bottom:20px;
+right:20px;
+width:120px;
+border-radius:12px;
+box-shadow:0 0 10px rgba(0,0,0,0.5);
+}

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gourmet Palace</title>
+  <title>Winkelwerk</title>
+  <link rel="icon" href="logo.png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-
     body { background: #f5f5f5; }
 
     header {
@@ -64,8 +64,6 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    .card h3 { margin-bottom: 10px; }
-
     footer {
       background: #111;
       color: white;
@@ -80,73 +78,96 @@
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+
+    @media (max-width: 768px) {
+      header h1 { font-size: 35px; }
+      nav a { display: block; margin: 10px 0; }
+      .menu { grid-template-columns: 1fr; }
+      form input, form textarea { width: 95%; }
+    }
   </style>
 </head>
 <body>
 
 <nav>
-  <a href="#home">Home</a>
-  <a href="#menu">Menu</a>
-  <a href="#about">About</a>
-  <a href="#contact">Contact</a>
+  <img src="logo.png" alt="Winkelwerk Logo" style="height:40px; vertical-align:middle;">
+  <a href="#home">Startseite</a>
+  <a href="#menu">Menü</a>
+  <a href="#about">Über uns</a>
+  <a href="#contact">Kontakt</a>
 </nav>
 
 <header id="home">
-  <h1>Gourmet Palace</h1>
-  <p>Fine Dining Experience</p>
-  <button class="btn">Reserve Now</button>
+  <h1>Winkelwerk</h1>
+  <p>Dein Restaurant für besonderen Genuss</p>
+  <button class="btn">Jetzt reservieren</button>
 </header>
 
 <section id="menu">
-  <h2>Our Menu</h2>
+  <h2>Unser Menü</h2>
   <div class="menu">
+
     <div class="card">
-      <h3>Pizza</h3>
-      <p>Fresh Italian pizza</p>
-      <p><b>12€</b></p>
+      <h3>Smashburger</h3>
+      <p>Frisch gesmashtes Rindfleisch-Patty vom Holzkohlegrill im Sesam-Bun, mit Salat, Tomaten und geschmolzenem Käse.</p>
     </div>
+
     <div class="card">
-      <h3>Pasta</h3>
-      <p>Homemade pasta</p>
-      <p><b>10€</b></p>
+      <h3>Tandoori Chicken</h3>
+      <p>Chicken mariniert in Joghurt und Gewürzen, gegrillt in einem Tandoor für einen besonders intensiven Geschmack.</p>
     </div>
-    <div class="card">
-      <h3>Steak</h3>
-      <p>Juicy grilled steak</p>
-      <p><b>20€</b></p>
-    </div>
+
   </div>
 </section>
 
 <section id="about">
-  <h2>About Us</h2>
-  <p>We are a premium restaurant serving high quality food made from fresh ingredients.</p>
+  <h2>Über uns</h2>
+  <p>Winkelwerk steht für hochwertige Zutaten, kreative Küche und ein unvergessliches Geschmackserlebnis.</p>
 </section>
 
 <section id="contact">
-  <h2>Contact & Reservation</h2>
+  <h2>Kontakt & Reservierung</h2>
   <form>
-    <input type="text" placeholder="Your Name" required><br>
-    <input type="email" placeholder="Your Email" required><br>
-    <textarea placeholder="Your Message"></textarea><br>
-    <button class="btn">Send</button>
+    <input type="text" placeholder="Dein Name" required><br>
+    <input type="email" placeholder="Deine Email" required><br>
+    <textarea placeholder="Deine Nachricht"></textarea><br>
+    <button class="btn">Absenden</button>
   </form>
 </section>
 
 <footer>
-  <p>© 2026 Gourmet Palace</p>
+  <p>© 2026 Winkelwerk</p>
 </footer>
 
 <script>
-  // simple smooth scroll
-  document.querySelectorAll('a').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      document.querySelector(this.getAttribute('href')).scrollIntoView({
-        behavior: 'smooth'
-      });
-    });
-  });
+const ua = navigator.userAgent;
+console.log("User Agent:", ua);
+// Geräteerkennung + Hinweis
+function getDeviceType() {
+  const ua = navigator.userAgent;
+  if (/tablet|ipad|playbook|silk/i.test(ua)) return "Tablet";
+  if (/mobile|android|iphone/i.test(ua)) return "Mobile";
+  return "Desktop";
+}
+
+const device = getDeviceType();
+console.log("Gerät:", device);
+
+// Optional: Hinweis für Mobile User
+if (device === "Mobile") {
+  const notice = document.createElement("div");
+  notice.innerText = "Du nutzt die mobile Version 📱";
+  notice.style.position = "fixed";
+  notice.style.bottom = "10px";
+  notice.style.left = "50%";
+  notice.style.transform = "translateX(-50%)";
+  notice.style.background = "black";
+  notice.style.color = "white";
+  notice.style.padding = "10px 15px";
+  notice.style.borderRadius = "8px";
+  notice.style.fontSize = "14px";
+  document.body.appendChild(notice);
+}
 </script>
 
 </body>

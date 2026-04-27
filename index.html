@@ -6,11 +6,18 @@
   <title>Winkelwerk</title>
   <link rel="icon" href="logo.png">
 
+  <!-- EMAILJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("QUSJfkrSX2GOcqydg");
+    })();
+  </script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
     body { background: #f5f5f5; }
 
-    /* HAMBURGER ICON */
     .menu-icon {
       position: fixed;
       top: 15px;
@@ -24,7 +31,6 @@
       border-radius: 8px;
     }
 
-    /* SLIDE NAV */
     nav {
       position: fixed;
       top: 0;
@@ -39,9 +45,7 @@
       z-index: 1500;
     }
 
-    nav.open {
-      left: 0;
-    }
+    nav.open { left: 0; }
 
     nav a {
       color: white;
@@ -51,9 +55,7 @@
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
-    nav a:hover {
-      background: #ff4d4d;
-    }
+    nav a:hover { background: #ff4d4d; }
 
     header {
       background: url('https://images.unsplash.com/photo-1541542684-4a1cbe0f7b6d') center/cover;
@@ -130,10 +132,8 @@
 
 <body>
 
-<!-- HAMBURGER -->
 <div class="menu-icon" onclick="toggleMenu()">☰</div>
 
-<!-- SLIDE MENU -->
 <nav id="sideMenu">
   <a href="#home" onclick="toggleMenu()">Startseite</a>
   <a href="#menu" onclick="toggleMenu()">Menü</a>
@@ -154,13 +154,13 @@
     <div class="card">
       <img src="https://oldworldgardenfarms.com/wp-content/uploads/2025/05/smashburger-735x735.jpg">
       <h3>Smashburger</h3>
-      <p>Frisch gesmashtes Rindfleisch-Patty vom Holzkohlegrill im Sesam-Bun, mit Salat, Tomaten und geschmolzenem Ofenkäse.</p>
+      <p>Frisch gesmashtes Rindfleisch-Patty vom Holzkohlegrill im Sesam-Bun.</p>
     </div>
 
     <div class="card">
       <img src="https://images.getrecipekit.com/20250721213330-Tandoori-Chicken-2.jpg?aspect_ratio=16:9&quality=90&">
       <h3>Tandoori Chicken</h3>
-      <p>Chicken mariniert in Joghurt und Gewürzen, gegrillt in einem Tandoor für intensiven Geschmack.</p>
+      <p>Chicken mariniert in Joghurt und Gewürzen, gegrillt im Tandoor.</p>
     </div>
 
   </div>
@@ -168,16 +168,17 @@
 
 <section id="about">
   <h2>Über uns</h2>
-  <p>Winkelwerk steht für hochwertige Zutaten, kreative Küche und ein unvergessliches Geschmackserlebnis.</p>
+  <p>Winkelwerk steht für hochwertige Zutaten und kreative Küche.</p>
 </section>
 
 <section id="contact">
   <h2>Kontakt & Reservierung</h2>
-  <form>
-    <input type="text" placeholder="Dein Name" required><br>
-    <input type="email" placeholder="Deine Email" required><br>
-    <textarea placeholder="Deine Nachricht"></textarea><br>
-    <button class="btn">Absenden</button>
+
+  <form id="contact-form">
+    <input type="text" name="name" placeholder="Dein Name" required><br>
+    <input type="email" name="email" placeholder="Deine Email" required><br>
+    <textarea name="message" placeholder="Deine Nachricht" required></textarea><br>
+    <button type="submit" class="btn">Absenden</button>
   </form>
 </section>
 
@@ -189,6 +190,23 @@
 function toggleMenu(){
   document.getElementById("sideMenu").classList.toggle("open");
 }
+
+// EMAILJS SEND
+document.getElementById("contact-form").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  emailjs.sendForm(
+    "service_1mlrs3j",
+    "template_qebzqvw",
+    this
+  ).then(() => {
+    alert("Nachricht gesendet 🚀");
+    this.reset();
+  }, (error) => {
+    alert("Fehler beim Senden ❌");
+    console.log(error);
+  });
+});
 </script>
 
 </body>

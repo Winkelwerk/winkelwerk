@@ -3,8 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Winkelwerk">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#2b2b2b">
   <title>Winkelwerk</title>
-  <link rel="icon" href="logo.png">
+  <link rel="icon" type="image/png" href="winkelwerlk.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
@@ -55,6 +60,13 @@
 
     nav.open {
       left: 0;
+    }
+
+    @media (hover: hover) {
+      .menu-icon:hover + nav,
+      nav:hover {
+        left: 0;
+      }
     }
 
     nav a {
@@ -273,6 +285,10 @@
 
 <script>
   function toggleMenu() {
+    if (window.matchMedia("(hover: hover)").matches) {
+      return;
+    }
+
     document.getElementById("sideMenu").classList.toggle("open");
   }
 

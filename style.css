@@ -62,6 +62,13 @@ nav.open{
   left:0;
 }
 
+@media (hover:hover){
+  .menu-icon:hover + nav,
+  nav:hover{
+    left:0;
+  }
+}
+
 /* HERO SECTION */
 
 header{

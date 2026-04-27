@@ -1,4 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Winkelwerk</title>
+  <link rel="icon" href="logo.png">
 
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function () {
+      emailjs.init("QUSJfkrSX2GOcqydg");
+    })();
+  </script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #ffffff;
+      color: #1f1f1f;
+    }
+
+    .menu-icon {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 2000;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 250px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      padding-top: 80px;
+      transition: 0.3s;
+      z-index: 1500;
+    }
+
+    nav.open {
+      left: 0;
+    }
+
+    nav a {
+      color: white;
+      padding: 15px 20px;
+      text-decoration: none;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    nav a:hover {
+      background: #ff4d4d;
     }
 
     header {
@@ -6,22 +74,14 @@
       min-height: 100vh;
       color: white;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
       padding: 110px 20px 60px;
-      background:
-        linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.45)),
-        url("https://images.unsplash.com/photo-1541542684-4a1cbe0f7b6d") center/cover;
       overflow: hidden;
       isolation: isolate;
     }
 
-    header h1 {
-      font-size: 60px;
-      margin-bottom: 22px;
-      text-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
     header::before {
       content: "";
       position: absolute;
@@ -32,25 +92,26 @@
       z-index: -2;
     }
 
-    .hero-image-wrap {
     header::after {
       content: "";
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(rgba(12, 12, 12, 0.45), rgba(12, 12, 12, 0.58)),
+        linear-gradient(
+          to bottom,
+          rgba(12, 12, 12, 0.46) 0%,
+          rgba(12, 12, 12, 0.42) 48%,
+          rgba(12, 12, 12, 0.18) 68%,
+          rgba(255, 255, 255, 0.18) 82%,
+          rgba(255, 255, 255, 0.72) 92%,
+          #ffffff 100%
+        ),
         radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 55%);
       z-index: -1;
     }
 
     .hero-content {
       width: min(92vw, 760px);
-      margin-bottom: 24px;
-      padding: 12px;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(6px);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
       padding: 36px 28px;
       border-radius: 28px;
       background: rgba(0, 0, 0, 0.18);
@@ -58,12 +119,6 @@
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
     }
 
-    .hero-image {
-      display: block;
-      width: 100%;
-      height: auto;
-      border-radius: 18px;
-      object-fit: cover;
     header h1 {
       font-size: 60px;
       margin-bottom: 14px;
@@ -73,41 +128,170 @@
 
     header p {
       font-size: 20px;
-      margin-bottom: 20px;
       margin-bottom: 24px;
       text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
     }
 
+    .btn {
+      background: #ff4d4d;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    section {
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      background: #111;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    form input,
+    form textarea {
+      width: 80%;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
         font-size: 35px;
       }
 
-      .hero-image-wrap {
       .hero-content {
         width: min(95vw, 560px);
-        padding: 8px;
-        border-radius: 18px;
         padding: 28px 18px;
         border-radius: 22px;
       }
 
       header p {
+        font-size: 18px;
+      }
+
+      .menu {
+        grid-template-columns: 1fr;
+      }
+
+      form input,
+      form textarea {
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+
+<nav id="sideMenu">
+  <a href="#home" onclick="toggleMenu()">Startseite</a>
+  <a href="#menu" onclick="toggleMenu()">Men&uuml;</a>
+  <a href="#about" onclick="toggleMenu()">&Uuml;ber uns</a>
+  <a href="#contact" onclick="toggleMenu()">Kontakt</a>
 </nav>
 
 <header id="home">
-  <h1>Winkelwerk</h1>
-  <div class="hero-image-wrap">
-    <img
-      class="hero-image"
-      src="https://www.gasthof-winkler.de/images/joomlaplates/festsaal.jpg"
-      alt="Festsaal im Winkelwerk"
-    >
   <div class="hero-content">
     <h1>Winkelwerk</h1>
     <p>Dein Restaurant f&uuml;r besonderen Genuss</p>
     <button class="btn">Jetzt reservieren</button>
   </div>
-  <p>Dein Restaurant f&uuml;r besonderen Genuss</p>
-  <button class="btn">Jetzt reservieren</button>
 </header>
 
 <section id="menu">
+  <h2>Unser Men&uuml;</h2>
+  <div class="menu">
+    <div class="card">
+      <img src="https://oldworldgardenfarms.com/wp-content/uploads/2025/05/smashburger-735x735.jpg" alt="Smashburger">
+      <h3>Smashburger</h3>
+      <p>Frisch gesmashtes Rindfleisch-Patty vom Holzkohlegrill im Sesam-Bun.</p>
+    </div>
+
+    <div class="card">
+      <img src="https://images.getrecipekit.com/20250721213330-Tandoori-Chicken-2.jpg?aspect_ratio=16:9&quality=90&" alt="Tandoori Chicken">
+      <h3>Tandoori Chicken</h3>
+      <p>Chicken mariniert in Joghurt und Gew&uuml;rzen, gegrillt im Tandoor.</p>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <h2>&Uuml;ber uns</h2>
+  <p>Winkelwerk steht f&uuml;r hochwertige Zutaten und kreative K&uuml;che.</p>
+</section>
+
+<section id="contact">
+  <h2>Kontakt &amp; Reservierung</h2>
+  <form id="contact-form">
+    <input type="text" name="name" placeholder="Dein Name" required><br>
+    <input type="email" name="email" placeholder="Deine Email" required><br>
+    <textarea name="message" placeholder="Deine Nachricht" required></textarea><br>
+    <button type="submit" class="btn">Absenden</button>
+  </form>
+</section>
+
+<footer>
+  <p>&copy; 2026 Winkelwerk</p>
+</footer>
+
+<script>
+  function toggleMenu() {
+    document.getElementById("sideMenu").classList.toggle("open");
+  }
+
+  document.getElementById("contact-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    emailjs.sendForm(
+      "service_1mlrs3j",
+      "template_qebzqvw",
+      this
+    ).then(() => {
+      alert("Nachricht gesendet");
+      this.reset();
+    }, (error) => {
+      alert("Fehler beim Senden");
+      console.log(error);
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -4,47 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Winkelwerk">
+  <meta name="apple-mobile-web-app-title" content="Winkelwerk Menue">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#2b2b2b">
   <meta name="color-scheme" content="light dark">
-  <title>Winkelwerk</title>
-  <link rel="icon" type="image/png" href="winkelwerlk.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="manifest" href="manifest.webmanifest">
-
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="app-config.js"></script>
-  <script>
-    (function () {
-      function handleHashRoute() {
-        const routes = {
-          "#menu": "./menü/",
-          "#admin": "./admin/",
-          "#inbox": "./inbox/"
-        };
-        const target = routes[String(window.location.hash || "").toLowerCase()];
-
-        if (!target) {
-          return;
-        }
-
-        const destination = new URL(target, window.location.href).href;
-
-        if (destination !== window.location.href) {
-          window.location.replace(destination);
-        }
-      }
-
-      handleHashRoute();
-      window.addEventListener("hashchange", handleHashRoute);
-    })();
-  </script>
-  <script>
-    (function () {
-      emailjs.init("QUSJfkrSX2GOcqydg");
-    })();
-  </script>
+  <title>Winkelwerk Menue</title>
+  <link rel="icon" type="image/png" href="../winkelwerlk.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../app-config.js"></script>
 
   <style>
     :root {
@@ -65,9 +33,6 @@
       --card-bg: #ffffff;
       --card-text: #1f1f1f;
       --card-shadow: rgba(0, 0, 0, 0.1);
-      --field-bg: #ffffff;
-      --field-color: #1f1f1f;
-      --field-border: #d0d0d0;
       --placeholder-color: #7b7b7b;
       --footer-bg: #111111;
       --footer-text: #ffffff;
@@ -98,9 +63,6 @@
       --card-bg: #17191d;
       --card-text: #f3f4f6;
       --card-shadow: rgba(0, 0, 0, 0.35);
-      --field-bg: #111318;
-      --field-color: #f3f4f6;
-      --field-border: #31343b;
       --placeholder-color: #9ca3af;
       --footer-bg: #090a0c;
       --footer-text: #ffffff;
@@ -137,8 +99,6 @@
     nav,
     .card,
     footer,
-    form input,
-    form textarea,
     .hero-content {
       transition:
         background-color 0.35s ease,
@@ -304,7 +264,7 @@
 
     header {
       position: relative;
-      min-height: 100vh;
+      min-height: 72vh;
       color: white;
       display: flex;
       justify-content: center;
@@ -354,7 +314,7 @@
     }
 
     header h1 {
-      font-size: 60px;
+      font-size: clamp(42px, 6vw, 64px);
       margin-bottom: 14px;
       letter-spacing: 0.02em;
       text-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
@@ -367,19 +327,25 @@
     }
 
     .btn {
-      background: var(--btn-bg);
-      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
       padding: 12px 25px;
       border: none;
+      border-radius: 999px;
+      background: var(--btn-bg);
+      color: #ffffff;
+      text-decoration: none;
       cursor: pointer;
-      border-radius: 8px;
       font-size: 16px;
+      font-weight: bold;
     }
 
     .btn:hover,
     .theme-toggle:hover {
       background: var(--btn-bg-hover);
-      color: white;
+      color: #ffffff;
     }
 
     section {
@@ -389,12 +355,6 @@
 
     section h2 {
       margin-bottom: 20px;
-    }
-
-    .menu {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
     }
 
     .menu-copy,
@@ -412,6 +372,14 @@
 
     .menu-state.is-hidden {
       display: none;
+    }
+
+    .menu {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
     }
 
     .card {
@@ -498,81 +466,6 @@
     }
 
     .menu-card-link:hover {
-      background: var(--btn-bg-hover);
-      color: #ffffff;
-    }
-
-    .section-shell {
-      width: min(1100px, 100%);
-      margin: 0 auto;
-    }
-
-    .contact-panel,
-    .map-panel {
-      background: var(--card-bg);
-      color: var(--card-text);
-      padding: 24px;
-      border-radius: 18px;
-      box-shadow: 0 4px 10px var(--card-shadow);
-    }
-
-    .contact-panel {
-      width: min(760px, 100%);
-      margin: 0 auto;
-    }
-
-    .contact-panel p,
-    .map-panel p {
-      line-height: 1.65;
-    }
-
-    .location-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
-      gap: 24px;
-      align-items: stretch;
-    }
-
-    .contact-meta {
-      margin-top: 16px;
-      display: grid;
-      gap: 10px;
-      text-align: left;
-    }
-
-    .map-panel {
-      text-align: left;
-      display: grid;
-      gap: 16px;
-    }
-
-    .map-frame {
-      width: 100%;
-      min-height: 320px;
-      border: 0;
-      border-radius: 16px;
-    }
-
-    .map-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .map-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      background: var(--btn-bg);
-      color: #ffffff;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .map-link:hover {
       background: var(--btn-bg-hover);
       color: #ffffff;
     }
@@ -668,22 +561,6 @@
       transform: translateY(-1px);
     }
 
-    form input,
-    form textarea {
-      width: 80%;
-      padding: 10px;
-      margin: 10px;
-      border-radius: 6px;
-      border: 1px solid var(--field-border);
-      background: var(--field-bg);
-      color: var(--field-color);
-    }
-
-    form input::placeholder,
-    form textarea::placeholder {
-      color: var(--placeholder-color);
-    }
-
     @media (hover: hover) and (pointer: fine) {
       .theme-toggle {
         display: inline-flex;
@@ -691,8 +568,16 @@
     }
 
     @media (max-width: 768px) {
-      header h1 {
-        font-size: 35px;
+      .menu {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        min-height: 62vh;
+      }
+
+      header p {
+        font-size: 18px;
       }
 
       .hero-content {
@@ -700,32 +585,14 @@
         padding: 28px 18px;
         border-radius: 22px;
       }
-
-      header p {
-        font-size: 18px;
-      }
-
-      .menu {
-        grid-template-columns: 1fr;
-      }
-
-      .location-layout {
-        grid-template-columns: 1fr;
-      }
-
-      form input,
-      form textarea {
-        width: 95%;
-      }
     }
   </style>
 </head>
 
 <body>
-
 <div class="maintenance-screen" id="maintenanceScreen" aria-live="polite">
   <div class="maintenance-card">
-    <img src="winkelwerlk.png" alt="Winkelwerk">
+    <img src="../winkelwerlk.png" alt="Winkelwerk">
     <p class="maintenance-kicker">Bitte etwas Geduld</p>
     <h2>Website wird gerade bearbeitet</h2>
     <p id="maintenanceMessage">Bitte spaeter erneut versuchen.</p>
@@ -736,12 +603,12 @@
 <button class="theme-toggle" id="themeToggle" type="button" aria-label="Zum Dunkelmodus wechseln">Dunkelmodus</button>
 
 <nav id="sideMenu">
-  <a href="#home" onclick="toggleMenu()">Startseite</a>
-  <a href="./menü/" onclick="toggleMenu()">Men&uuml;</a>
-  <a href="#about" onclick="toggleMenu()">&Uuml;ber uns</a>
-  <a href="#contact" onclick="toggleMenu()">Kontakt</a>
-  <a href="#location" onclick="toggleMenu()">Standort</a>
-  <a href="./inbox/" onclick="toggleMenu()">Postfach</a>
+  <a href="../" onclick="toggleMenu()">Startseite</a>
+  <a href="./" onclick="toggleMenu()">Men&uuml;</a>
+  <a href="../#about" onclick="toggleMenu()">&Uuml;ber uns</a>
+  <a href="../#contact" onclick="toggleMenu()">Kontakt</a>
+  <a href="../#location" onclick="toggleMenu()">Standort</a>
+  <a href="../inbox/" onclick="toggleMenu()">Postfach</a>
   <div class="nav-divider"></div>
   <button class="notify-toggle" id="notifyToggle" type="button" data-state="off" aria-pressed="false">
     <span class="notify-copy">
@@ -753,80 +620,25 @@
   <p class="notify-hint" id="notifyHint">Aktiviert Browser-Benachrichtigungen f&uuml;r Winkelwerk.</p>
 </nav>
 
-<header id="home">
+<header>
   <div class="hero-content">
-    <h1>Winkelwerk</h1>
-    <p>Dein Restaurant f&uuml;r besonderen Genuss</p>
-    <button class="btn" type="button" onclick="window.location.href='./menü/'">Zum Men&uuml;</button>
+    <h1>Unser Men&uuml;</h1>
+    <p>Alle Gerichte zentral aus dem Adminbereich gepflegt, auf einer eigenen Seite fuer den klaren Fokus aufs Essen.</p>
+    <a class="btn" href="../#contact">Jetzt reservieren</a>
   </div>
 </header>
 
-<section id="about">
-  <h2>&Uuml;ber uns</h2>
-  <p>Winkelwerk steht f&uuml;r hochwertige Zutaten und kreative K&uuml;che.</p>
-</section>
-
-<section id="contact">
-  <h2>Kontakt &amp; Reservierung</h2>
-  <div class="section-shell">
-    <div class="contact-panel">
-      <p>Reservierungen und allgemeine Anfragen kannst du uns direkt &uuml;ber dieses Formular schicken.</p>
-
-      <form id="contact-form">
-        <input type="text" name="name" placeholder="Dein Name" required><br>
-        <input type="email" name="email" placeholder="Deine Email" required><br>
-        <textarea name="message" placeholder="Deine Nachricht" required></textarea><br>
-        <button type="submit" class="btn">Absenden</button>
-      </form>
-    </div>
-  </div>
-</section>
-
-<section id="location">
-  <h2>Standort</h2>
-  <div class="section-shell location-layout">
-    <div class="contact-panel">
-      <p>Du findest uns in Emskirchen am Altschauerberg 8. Ueber die Buttons kannst du den Standort direkt in Google Maps oeffnen oder sofort die Wegbeschreibung starten.</p>
-
-      <div class="contact-meta">
-        <p><strong>Adresse:</strong> Altschauerberg 8, 91448 Emskirchen</p>
-        <p><strong>Maps-Link:</strong> Der genaue Standort ist mit deinem Google-Maps-Eintrag verbunden.</p>
-      </div>
-
-      <div class="map-actions">
-        <a
-          class="map-link"
-          href="https://www.google.com/maps/dir/?api=1&destination=Altschauerberg%208%2C%2091448%20Emskirchen"
-          target="_blank"
-          rel="noreferrer">
-          Route starten
-        </a>
-        <a
-          class="map-link"
-          href="https://www.google.com/maps/place/Altschauerberg+8,+91448+Emskirchen/@49.5334645,10.7003888,706m/data=!3m2!1e3!4b1!4m6!3m5!1s0x47a2080ff94d1295:0x3c620674f0119ff6!8m2!3d49.5334645!4d10.7029637!16s%2Fg%2F11v07xj993?entry=ttu&g_ep=EgoyMDI2MDQyNy4wIKXMDSoASAFQAw%3D%3D"
-          target="_blank"
-          rel="noreferrer">
-          In Google Maps oeffnen
-        </a>
-      </div>
-    </div>
-
-    <div class="map-panel">
-      <p><strong>Google Maps</strong></p>
-      <iframe
-        class="map-frame"
-        src="https://www.google.com/maps?q=49.5334645,10.7029637&z=16&output=embed"
-        title="Google Maps Standort Winkelwerk"
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"></iframe>
-    </div>
-  </div>
+<section>
+  <h2>Winkelwerk Men&uuml;</h2>
+  <p class="menu-copy">Saisonal, frisch und direkt aus dem Winkelwerk. Dieses Men&uuml; wird vollstaendig ueber dein Admin-Panel verwaltet.</p>
+  <div class="menu" id="menuGrid"></div>
+  <p class="menu-state is-hidden" id="menuState"></p>
 </section>
 
 <footer>
   <div class="footer-row">
     <p>&copy; 2026 Winkelwerk</p>
-    <a class="footer-admin-link" href="./admin/">Admin</a>
+    <a class="footer-admin-link" href="../admin/">Admin</a>
   </div>
 </footer>
 
@@ -845,7 +657,7 @@
   const menuState = document.getElementById("menuState");
   const maintenanceScreen = document.getElementById("maintenanceScreen");
   const maintenanceMessage = document.getElementById("maintenanceMessage");
-  const inboxUrl = new URL("./inbox/", window.location.href).href;
+  const inboxUrl = new URL("../inbox/", window.location.href).href;
   const defaultSiteSettings = {
     maintenanceMode: false,
     maintenanceMessage: "Website wird gerade bearbeitet. Bitte spaeter erneut versuchen."
@@ -997,10 +809,6 @@
   }
 
   function setMenuState(message, hidden) {
-    if (!menuState) {
-      return;
-    }
-
     menuState.textContent = message;
     menuState.classList.toggle("is-hidden", Boolean(hidden));
   }
@@ -1080,10 +888,6 @@
   }
 
   function renderMenuItems(items, emptyMessage) {
-    if (!menuGrid) {
-      return;
-    }
-
     const normalizedItems = (Array.isArray(items) ? items : [])
       .map(normalizeMenuItem)
       .filter(function (item) {
@@ -1186,8 +990,8 @@
     }
 
     if (!serviceWorkerRegistrationPromise) {
-      serviceWorkerRegistrationPromise = navigator.serviceWorker.register("./service-worker.js", {
-        scope: "./"
+      serviceWorkerRegistrationPromise = navigator.serviceWorker.register("../service-worker.js", {
+        scope: "../"
       });
     }
 
@@ -1237,10 +1041,6 @@
   }
 
   function setNotificationUi(mode, statusText, hintHtml) {
-    if (!notifyToggle || !notifyStatus || !notifyHint) {
-      return;
-    }
-
     notifyToggle.dataset.state = mode === "on" ? "on" : "off";
     notifyToggle.setAttribute("aria-pressed", mode === "on" ? "true" : "false");
     notifyStatus.textContent = statusText;
@@ -1248,16 +1048,12 @@
   }
 
   async function updateNotificationUi() {
-    if (!notifyToggle || !notifyStatus || !notifyHint) {
-      return;
-    }
-
     if (!notificationsSupported()) {
       notifyToggle.disabled = true;
       setNotificationUi(
         "off",
         "Nicht verfuegbar",
-        "Push braucht HTTPS, Service Worker und einen unterst&uuml;tzten Browser."
+        "Push braucht HTTPS, Service Worker und einen unterstuetzten Browser."
       );
       return;
     }
@@ -1267,7 +1063,7 @@
       setNotificationUi(
         "off",
         "Setup fehlt",
-        "Trage zuerst die Backend-URL und den VAPID-Key in <code>app-config.js</code> ein."
+        "Trage zuerst die Backend-URL und den VAPID-Key in <code>../app-config.js</code> ein."
       );
       return;
     }
@@ -1281,7 +1077,7 @@
       setNotificationUi(
         "on",
         "An",
-        "Interne Hinweise sind aktiv. Neue Nachrichten landen auch im <a href=\"./inbox/\">Postfach</a>."
+        "Interne Hinweise sind aktiv. Neue Nachrichten landen auch im <a href=\"../inbox/\">Postfach</a>."
       );
       return;
     }
@@ -1298,17 +1094,12 @@
     setNotificationUi(
       "off",
       "Aus",
-      "Aktiviert Web-Push f&uuml;r interne Winkelwerk-Nachrichten auf diesem Ger&auml;t."
+      "Aktiviert Web-Push fuer interne Winkelwerk-Nachrichten auf diesem Geraet."
     );
   }
 
   async function enableNotifications() {
-    if (!notificationsSupported()) {
-      await updateNotificationUi();
-      return;
-    }
-
-    if (!pushConfigReady()) {
+    if (!notificationsSupported() || !pushConfigReady()) {
       await updateNotificationUi();
       return;
     }
@@ -1355,8 +1146,8 @@
 
       await registration.showNotification("Winkelwerk", {
         body: "Push ist jetzt auf diesem Geraet aktiviert.",
-        icon: "./apple-touch-icon.png",
-        badge: "./icon-192.png",
+        icon: "../apple-touch-icon.png",
+        badge: "../icon-192.png",
         data: {
           url: inboxUrl
         }
@@ -1367,7 +1158,7 @@
       setNotificationUi(
         "off",
         "Fehler",
-        "Die Push-Anmeldung hat nicht funktioniert. Pr&uuml;fe Backend, VAPID-Key und HTTPS."
+        "Die Push-Anmeldung hat nicht funktioniert. Pruefe Backend, VAPID-Key und HTTPS."
       );
       return;
     }
@@ -1428,22 +1219,7 @@
   syncThemeWithDevice();
   updateNotificationUi();
   loadSiteSettings();
-
-  document.getElementById("contact-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    emailjs.sendForm(
-      "service_1mlrs3j",
-      "template_qebzqvw",
-      this
-    ).then(() => {
-      alert("Nachricht gesendet");
-      this.reset();
-    }, (error) => {
-      alert("Fehler beim Senden");
-      console.log(error);
-    });
-  });
+  loadMenuItems();
 </script>
 
 </body>

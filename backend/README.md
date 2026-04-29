@@ -20,9 +20,12 @@ Offizielle Infos:
 ## Was in diesem Ordner schon fertig ist
 
 - `supabase/migrations/20260427_push.sql`
-  Das Datenbankschema fuer Push-Abos und interne Nachrichten
+  Das Datenbankschema fuer Push-Abos, interne Nachrichten und das Website-Menue
 - `supabase/functions/push-api/index.ts`
   Die HTTP-API fuer
+  - `GET /menu`
+  - `GET /menu-admin`
+  - `POST /menu-admin`
   - `POST /subscribe`
   - `POST /unsubscribe`
   - `POST /send`

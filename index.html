@@ -392,6 +392,23 @@
       gap: 20px;
     }
 
+    .menu-copy,
+    .menu-state {
+      width: min(720px, 100%);
+      margin: 0 auto 24px;
+      line-height: 1.6;
+      color: var(--placeholder-color);
+    }
+
+    .menu-state {
+      margin-top: 24px;
+      margin-bottom: 0;
+    }
+
+    .menu-state.is-hidden {
+      display: none;
+    }
+
     .card {
       background: var(--card-bg);
       color: var(--card-text);
@@ -410,6 +427,74 @@
       object-fit: cover;
       border-radius: 10px;
       margin-bottom: 10px;
+    }
+
+    .menu-card {
+      text-align: left;
+    }
+
+    .menu-card-body {
+      display: grid;
+      gap: 12px;
+    }
+
+    .menu-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .menu-card-title {
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .menu-card-price {
+      color: var(--btn-bg);
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .menu-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .menu-card-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 77, 77, 0.1);
+      color: var(--card-text);
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .menu-card-description {
+      line-height: 1.65;
+      color: var(--placeholder-color);
+    }
+
+    .menu-card-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-height: 44px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: var(--btn-bg);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .menu-card-link:hover {
+      background: var(--btn-bg-hover);
+      color: #ffffff;
     }
 
     footer {
@@ -500,19 +585,9 @@
 
 <section id="menu">
   <h2>Unser Men&uuml;</h2>
-  <div class="menu">
-    <div class="card">
-      <img src="https://oldworldgardenfarms.com/wp-content/uploads/2025/05/smashburger-735x735.jpg" alt="Smashburger">
-      <h3>Smashburger</h3>
-      <p>Frisch gesmashtes Rindfleisch-Patty vom Holzkohlegrill im Sesam-Bun.</p>
-    </div>
-
-    <div class="card">
-      <img src="https://images.getrecipekit.com/20250721213330-Tandoori-Chicken-2.jpg?aspect_ratio=16:9&quality=90&" alt="Tandoori Chicken">
-      <h3>Tandoori Chicken</h3>
-      <p>Chicken mariniert in Joghurt und Gew&uuml;rzen, gegrillt im Tandoor.</p>
-    </div>
-  </div>
+  <p class="menu-copy">Saisonal, frisch und direkt aus dem Winkelwerk. Das Men&uuml; wird zentral aus dem Adminbereich gepflegt.</p>
+  <div class="menu" id="menuGrid"></div>
+  <p class="menu-state is-hidden" id="menuState"></p>
 </section>
 
 <section id="about">
@@ -545,7 +620,31 @@
   const notifyToggle = document.getElementById("notifyToggle");
   const notifyStatus = document.getElementById("notifyStatus");
   const notifyHint = document.getElementById("notifyHint");
+  const menuGrid = document.getElementById("menuGrid");
+  const menuState = document.getElementById("menuState");
   const inboxUrl = new URL("./inbox/", window.location.href).href;
+  const defaultMenuItems = [
+    {
+      title: "Smashburger",
+      description: "Frisch gesmashtes Rindfleisch-Patty vom Holzkohlegrill im Sesam-Bun.",
+      imageUrl: "https://oldworldgardenfarms.com/wp-content/uploads/2025/05/smashburger-735x735.jpg",
+      category: "Burger",
+      badge: "Beliebt",
+      price: "",
+      ctaLabel: "",
+      ctaUrl: ""
+    },
+    {
+      title: "Tandoori Chicken",
+      description: "Chicken mariniert in Joghurt und Gewuerzen, gegrillt im Tandoor.",
+      imageUrl: "https://images.getrecipekit.com/20250721213330-Tandoori-Chicken-2.jpg?aspect_ratio=16:9&quality=90&",
+      category: "Signature",
+      badge: "",
+      price: "",
+      ctaLabel: "",
+      ctaUrl: ""
+    }
+  ];
   let serviceWorkerRegistrationPromise;
 
   function isDesktopDevice() {
@@ -606,6 +705,185 @@
 
   function normalizeApiBaseUrl() {
     return String(appConfig.pushApiBaseUrl || "").replace(/\/+$/, "");
+  }
+
+  function menuApiConfigured() {
+    return Boolean(normalizeApiBaseUrl());
+  }
+
+  function normalizeMenuItem(item) {
+    return {
+      title: String(item && item.title ? item.title : "").trim(),
+      description: String(item && item.description ? item.description : "").trim(),
+      imageUrl: String(item && item.imageUrl ? item.imageUrl : "").trim(),
+      category: String(item && item.category ? item.category : "").trim(),
+      badge: String(item && item.badge ? item.badge : "").trim(),
+      price: String(item && item.price ? item.price : "").trim(),
+      ctaLabel: String(item && item.ctaLabel ? item.ctaLabel : "").trim(),
+      ctaUrl: String(item && item.ctaUrl ? item.ctaUrl : "").trim()
+    };
+  }
+
+  function resolvePublicUrl(value) {
+    const raw = String(value || "").trim();
+
+    if (!raw) {
+      return "";
+    }
+
+    try {
+      const url = new URL(raw, window.location.href);
+
+      if (url.protocol === "http:" || url.protocol === "https:") {
+        return url.href;
+      }
+    } catch (error) {
+      return "";
+    }
+
+    return "";
+  }
+
+  function setMenuState(message, hidden) {
+    if (!menuState) {
+      return;
+    }
+
+    menuState.textContent = message;
+    menuState.classList.toggle("is-hidden", Boolean(hidden));
+  }
+
+  function createMenuTag(label) {
+    const tag = document.createElement("span");
+    tag.className = "menu-card-tag";
+    tag.textContent = label;
+    return tag;
+  }
+
+  function createMenuCard(item) {
+    const article = document.createElement("article");
+    article.className = "card menu-card";
+
+    const imageUrl = resolvePublicUrl(item.imageUrl);
+
+    if (imageUrl) {
+      const image = document.createElement("img");
+      image.src = imageUrl;
+      image.alt = item.title || "Menue-Eintrag";
+      article.appendChild(image);
+    }
+
+    const body = document.createElement("div");
+    body.className = "menu-card-body";
+
+    const header = document.createElement("div");
+    header.className = "menu-card-header";
+
+    const title = document.createElement("h3");
+    title.className = "menu-card-title";
+    title.textContent = item.title || "Ohne Titel";
+    header.appendChild(title);
+
+    if (item.price) {
+      const price = document.createElement("span");
+      price.className = "menu-card-price";
+      price.textContent = item.price;
+      header.appendChild(price);
+    }
+
+    body.appendChild(header);
+
+    if (item.category || item.badge) {
+      const tags = document.createElement("div");
+      tags.className = "menu-card-tags";
+
+      if (item.category) {
+        tags.appendChild(createMenuTag(item.category));
+      }
+
+      if (item.badge) {
+        tags.appendChild(createMenuTag(item.badge));
+      }
+
+      body.appendChild(tags);
+    }
+
+    const description = document.createElement("p");
+    description.className = "menu-card-description";
+    description.textContent = item.description;
+    body.appendChild(description);
+
+    const ctaUrl = resolvePublicUrl(item.ctaUrl);
+
+    if (item.ctaLabel && ctaUrl) {
+      const link = document.createElement("a");
+      link.className = "menu-card-link";
+      link.href = ctaUrl;
+      link.textContent = item.ctaLabel;
+      body.appendChild(link);
+    }
+
+    article.appendChild(body);
+    return article;
+  }
+
+  function renderMenuItems(items, emptyMessage) {
+    if (!menuGrid) {
+      return;
+    }
+
+    const normalizedItems = (Array.isArray(items) ? items : [])
+      .map(normalizeMenuItem)
+      .filter(function (item) {
+        return item.title && item.description;
+      });
+
+    menuGrid.replaceChildren();
+
+    if (!normalizedItems.length) {
+      setMenuState(emptyMessage || "Unser Menue wird gerade aktualisiert.", false);
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    normalizedItems.forEach(function (item) {
+      fragment.appendChild(createMenuCard(item));
+    });
+
+    menuGrid.appendChild(fragment);
+    setMenuState("", true);
+  }
+
+  async function loadMenuItems() {
+    if (!menuApiConfigured()) {
+      renderMenuItems(defaultMenuItems, "");
+      return;
+    }
+
+    setMenuState("Menue wird geladen ...", false);
+
+    try {
+      const response = await fetch(normalizeApiBaseUrl() + "/menu");
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Menu request failed");
+      }
+
+      const result = await response.json();
+      const items = Array.isArray(result && result.items) ? result.items : [];
+
+      if (!items.length) {
+        renderMenuItems([], "Unser Menue wird gerade aktualisiert.");
+        return;
+      }
+
+      renderMenuItems(items, "");
+    } catch (error) {
+      console.log(error);
+      renderMenuItems(defaultMenuItems, "");
+    }
   }
 
   function vapidKeyToUint8Array(base64String) {
@@ -868,6 +1146,7 @@
   });
   syncThemeWithDevice();
   updateNotificationUi();
+  loadMenuItems();
 
   document.getElementById("contact-form").addEventListener("submit", function (e) {
     e.preventDefault();

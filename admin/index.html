@@ -222,6 +222,151 @@
       gap: 14px;
     }
 
+    .admin-section {
+      margin-top: 30px;
+      padding-top: 26px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-head {
+      margin-bottom: 20px;
+    }
+
+    .section-head h3 {
+      font-size: clamp(22px, 3vw, 30px);
+      margin-bottom: 10px;
+    }
+
+    .section-head .lead {
+      margin-bottom: 0;
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .editor-card,
+    .menu-library {
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: var(--panel-strong);
+    }
+
+    .menu-library-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .small-btn {
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+
+    .check-field {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .check-field input {
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      margin: 0;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .menu-admin-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .menu-admin-item {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--field-bg);
+    }
+
+    .menu-admin-item.is-editing {
+      border-color: rgba(255, 77, 77, 0.45);
+      box-shadow: 0 0 0 1px rgba(255, 77, 77, 0.18);
+    }
+
+    .menu-admin-item.is-inactive {
+      opacity: 0.75;
+    }
+
+    .menu-admin-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .menu-admin-title {
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .menu-admin-meta,
+    .menu-admin-description,
+    .menu-admin-extra {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .menu-admin-tags,
+    .menu-admin-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .menu-admin-tags {
+      margin: 12px 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 77, 77, 0.1);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .tag.is-muted {
+      background: rgba(127, 127, 127, 0.12);
+      color: var(--muted);
+    }
+
+    .empty-box {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px dashed var(--field-border);
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
     .hint-box {
       margin-top: 20px;
       padding: 14px 16px;
@@ -260,6 +405,15 @@
 
       .grid {
         grid-template-columns: 1fr;
+      }
+
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .menu-library-topbar {
+        align-items: flex-start;
+        flex-direction: column;
       }
     }
   </style>
@@ -317,6 +471,91 @@
       <div class="hint-box">
         Diese Seite sendet echte Web-Push-Nachrichten ueber dein Backend. Der sichtbare Zugangsschutz ist clientseitig, die eigentliche Sendefreigabe laeuft ueber denselben Admin-Code auf dem Backend.
       </div>
+
+      <div class="admin-section">
+        <div class="section-head">
+          <p class="admin-kicker">Website Inhalt</p>
+          <h3>Modulares Men&uuml; verwalten</h3>
+          <p class="lead">Gerichte anlegen, bearbeiten, ausblenden oder in der Reihenfolge verschieben. Die Website laedt diese Eintr&auml;ge automatisch aus dem Backend.</p>
+        </div>
+
+        <div class="editor-grid">
+          <div class="editor-card">
+            <h3 id="menuEditorTitle">Neuen Eintrag anlegen</h3>
+
+            <form id="menuItemForm">
+              <input type="hidden" name="id" value="">
+
+              <div class="grid">
+                <label>
+                  Titel
+                  <input type="text" name="title" placeholder="z. B. Smashburger" required>
+                </label>
+
+                <label>
+                  Preis
+                  <input type="text" name="price" placeholder="z. B. 14,90 EUR">
+                </label>
+
+                <label>
+                  Kategorie
+                  <input type="text" name="category" placeholder="z. B. Burger">
+                </label>
+
+                <label>
+                  Badge
+                  <input type="text" name="badge" placeholder="z. B. Bestseller">
+                </label>
+
+                <label>
+                  Bild-URL
+                  <input type="url" name="image_url" placeholder="https://...">
+                </label>
+
+                <label>
+                  Button-Label
+                  <input type="text" name="cta_label" placeholder="z. B. Details">
+                </label>
+
+                <label>
+                  Button-Link
+                  <input type="text" name="cta_url" placeholder="./kontakt oder https://...">
+                </label>
+              </div>
+
+              <label>
+                Beschreibung
+                <textarea name="description" placeholder="Kurze Beschreibung des Gerichts..." required></textarea>
+              </label>
+
+              <label class="check-field">
+                <input type="checkbox" name="is_active" checked>
+                <span>Eintrag auf der Website sichtbar schalten</span>
+              </label>
+
+              <div class="action-row">
+                <button class="btn" type="submit">Eintrag speichern</button>
+                <button class="ghost-btn" id="menuResetButton" type="button">Neu beginnen</button>
+              </div>
+
+              <p class="status" id="menuFormStatus"></p>
+            </form>
+          </div>
+
+          <div class="menu-library">
+            <div class="menu-library-topbar">
+              <div>
+                <h3>Vorhandene Eintr&auml;ge</h3>
+                <p class="lead">Hier steuerst du Reihenfolge und Sichtbarkeit.</p>
+              </div>
+              <button class="ghost-btn small-btn" id="refreshMenuItems" type="button">Neu laden</button>
+            </div>
+
+            <div class="menu-admin-list" id="menuAdminList"></div>
+            <p class="status" id="menuListStatus"></p>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -332,7 +571,15 @@
     const lockAdmin = document.getElementById("lockAdmin");
     const adminMessageForm = document.getElementById("adminMessageForm");
     const messageStatus = document.getElementById("messageStatus");
+    const menuItemForm = document.getElementById("menuItemForm");
+    const menuFormStatus = document.getElementById("menuFormStatus");
+    const menuListStatus = document.getElementById("menuListStatus");
+    const menuAdminList = document.getElementById("menuAdminList");
+    const menuEditorTitle = document.getElementById("menuEditorTitle");
+    const menuResetButton = document.getElementById("menuResetButton");
+    const refreshMenuItems = document.getElementById("refreshMenuItems");
     let currentAdminCode = "";
+    let menuItems = [];
 
     function setStatus(target, message, type) {
       target.textContent = message;
@@ -351,27 +598,27 @@
       adminPanel.classList.add("is-open");
     }
 
-    function lockAdminPanel() {
-      currentAdminCode = "";
-      adminPanel.classList.remove("is-open");
-      gatePanel.classList.remove("hidden");
-      accessCode.value = "";
-      setStatus(gateStatus, "", "");
-      setStatus(messageStatus, "", "");
-    }
-
     function backendConfigured() {
       return Boolean(API_BASE);
     }
 
-    async function postJson(path, payload) {
+    async function requestJson(path, options) {
+      const method = options && options.method ? options.method : "GET";
+      const payload = options ? options.payload : undefined;
+      const headers = {};
+
+      if (currentAdminCode) {
+        headers["x-admin-code"] = currentAdminCode;
+      }
+
+      if (payload !== undefined) {
+        headers["Content-Type"] = "application/json";
+      }
+
       const response = await fetch(API_BASE + path, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-code": currentAdminCode
-        },
-        body: JSON.stringify(payload)
+        method,
+        headers,
+        body: payload !== undefined ? JSON.stringify(payload) : undefined
       });
 
       if (!response.ok) {
@@ -379,12 +626,354 @@
         throw new Error(errorText || "Request failed");
       }
 
-      return response.json();
+      const contentType = response.headers.get("content-type") || "";
+      return contentType.includes("application/json") ? response.json() : null;
+    }
+
+    function compareMenuItems(a, b) {
+      return Number(a.sortOrder || 0) - Number(b.sortOrder || 0);
+    }
+
+    function normalizeMenuItem(item) {
+      return {
+        id: String(item && item.id ? item.id : ""),
+        title: String(item && item.title ? item.title : "").trim(),
+        description: String(item && item.description ? item.description : "").trim(),
+        imageUrl: String(item && item.imageUrl ? item.imageUrl : "").trim(),
+        price: String(item && item.price ? item.price : "").trim(),
+        category: String(item && item.category ? item.category : "").trim(),
+        badge: String(item && item.badge ? item.badge : "").trim(),
+        ctaLabel: String(item && item.ctaLabel ? item.ctaLabel : "").trim(),
+        ctaUrl: String(item && item.ctaUrl ? item.ctaUrl : "").trim(),
+        isActive: item && item.isActive !== false,
+        sortOrder: Number.isFinite(Number(item && item.sortOrder)) ? Number(item.sortOrder) : 0
+      };
+    }
+
+    function getMenuFormId() {
+      return String(menuItemForm.elements.id.value || "");
+    }
+
+    function setMenuEditorTitle(editing) {
+      menuEditorTitle.textContent = editing ? "Eintrag bearbeiten" : "Neuen Eintrag anlegen";
+    }
+
+    function createTag(label, muted) {
+      const tag = document.createElement("span");
+      tag.className = "tag" + (muted ? " is-muted" : "");
+      tag.textContent = label;
+      return tag;
+    }
+
+    function createActionButton(label, action, itemId) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "ghost-btn small-btn";
+      button.textContent = label;
+      button.dataset.action = action;
+      button.dataset.id = itemId;
+      return button;
+    }
+
+    function getMenuItemById(itemId) {
+      return menuItems.find(function (item) {
+        return item.id === itemId;
+      }) || null;
+    }
+
+    function renderMenuAdminList() {
+      menuAdminList.replaceChildren();
+
+      if (!menuItems.length) {
+        const emptyBox = document.createElement("div");
+        emptyBox.className = "empty-box";
+        emptyBox.textContent = "Noch keine Menue-Eintraege vorhanden. Lege jetzt den ersten Eintrag an.";
+        menuAdminList.appendChild(emptyBox);
+        return;
+      }
+
+      const activeFormId = getMenuFormId();
+      const sortedItems = menuItems.slice().sort(compareMenuItems);
+
+      sortedItems.forEach(function (item, index) {
+        const article = document.createElement("article");
+        article.className = "menu-admin-item";
+
+        if (!item.isActive) {
+          article.classList.add("is-inactive");
+        }
+
+        if (item.id === activeFormId) {
+          article.classList.add("is-editing");
+        }
+
+        const header = document.createElement("div");
+        header.className = "menu-admin-header";
+
+        const titleWrap = document.createElement("div");
+        const title = document.createElement("h4");
+        title.className = "menu-admin-title";
+        title.textContent = item.title || "Ohne Titel";
+
+        const meta = document.createElement("p");
+        meta.className = "menu-admin-meta";
+        meta.textContent = "Position " + (index + 1) + (item.price ? " - " + item.price : "");
+
+        titleWrap.appendChild(title);
+        titleWrap.appendChild(meta);
+
+        header.appendChild(titleWrap);
+        header.appendChild(createTag(item.isActive ? "Live" : "Ausgeblendet", !item.isActive));
+        article.appendChild(header);
+
+        if (item.category || item.badge) {
+          const tags = document.createElement("div");
+          tags.className = "menu-admin-tags";
+
+          if (item.category) {
+            tags.appendChild(createTag(item.category, false));
+          }
+
+          if (item.badge) {
+            tags.appendChild(createTag(item.badge, false));
+          }
+
+          article.appendChild(tags);
+        }
+
+        const description = document.createElement("p");
+        description.className = "menu-admin-description";
+        description.textContent = item.description;
+        article.appendChild(description);
+
+        if (item.imageUrl || item.ctaLabel || item.ctaUrl) {
+          const extra = document.createElement("p");
+          extra.className = "menu-admin-extra";
+          extra.textContent = [
+            item.imageUrl ? "Bild hinterlegt" : "",
+            item.ctaLabel ? "Button: " + item.ctaLabel : "",
+            item.ctaUrl ? "Link gesetzt" : ""
+          ].filter(Boolean).join(" - ");
+          article.appendChild(extra);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "menu-admin-actions";
+        actions.appendChild(createActionButton("Bearbeiten", "edit", item.id));
+        actions.appendChild(createActionButton("Hoch", "up", item.id));
+        actions.appendChild(createActionButton("Runter", "down", item.id));
+        actions.appendChild(createActionButton(item.isActive ? "Ausblenden" : "Einblenden", "toggle", item.id));
+        actions.appendChild(createActionButton("Loeschen", "delete", item.id));
+        article.appendChild(actions);
+
+        menuAdminList.appendChild(article);
+      });
+    }
+
+    function fillMenuForm(item, preserveStatus) {
+      menuItemForm.elements.id.value = item.id;
+      menuItemForm.elements.title.value = item.title;
+      menuItemForm.elements.price.value = item.price;
+      menuItemForm.elements.category.value = item.category;
+      menuItemForm.elements.badge.value = item.badge;
+      menuItemForm.elements.image_url.value = item.imageUrl;
+      menuItemForm.elements.cta_label.value = item.ctaLabel;
+      menuItemForm.elements.cta_url.value = item.ctaUrl;
+      menuItemForm.elements.description.value = item.description;
+      menuItemForm.elements.is_active.checked = Boolean(item.isActive);
+      setMenuEditorTitle(true);
+
+      if (!preserveStatus) {
+        setStatus(menuFormStatus, "Eintrag wird bearbeitet.", "");
+      }
+
+      renderMenuAdminList();
+
+      if (!preserveStatus) {
+        menuItemForm.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }
+    }
+
+    function resetMenuForm() {
+      menuItemForm.reset();
+      menuItemForm.elements.id.value = "";
+      menuItemForm.elements.is_active.checked = true;
+      setMenuEditorTitle(false);
+      setStatus(menuFormStatus, "", "");
+      renderMenuAdminList();
+    }
+
+    function syncMenuFormFromState() {
+      const itemId = getMenuFormId();
+
+      if (!itemId) {
+        renderMenuAdminList();
+        return;
+      }
+
+      const freshItem = getMenuItemById(itemId);
+
+      if (!freshItem) {
+        resetMenuForm();
+        return;
+      }
+
+      fillMenuForm(freshItem, true);
+    }
+
+    function lockAdminPanel() {
+      currentAdminCode = "";
+      menuItems = [];
+      adminPanel.classList.remove("is-open");
+      gatePanel.classList.remove("hidden");
+      accessCode.value = "";
+      setStatus(gateStatus, "", "");
+      setStatus(messageStatus, "", "");
+      setStatus(menuListStatus, "", "");
+      resetMenuForm();
+      renderMenuAdminList();
+    }
+
+    async function loadMenuItems(options) {
+      const silent = options && options.silent;
+
+      if (!backendConfigured()) {
+        menuItems = [];
+        renderMenuAdminList();
+        setStatus(menuListStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+        return;
+      }
+
+      if (!currentAdminCode) {
+        return;
+      }
+
+      if (!silent) {
+        setStatus(menuListStatus, "Menue wird geladen ...", "");
+      }
+
+      try {
+        const result = await requestJson("/menu-admin");
+        menuItems = (Array.isArray(result && result.items) ? result.items : [])
+          .map(normalizeMenuItem)
+          .sort(compareMenuItems);
+
+        renderMenuAdminList();
+        syncMenuFormFromState();
+
+        if (!menuItems.length) {
+          setStatus(menuListStatus, "Noch keine Menue-Eintraege vorhanden.", "");
+          return;
+        }
+
+        setStatus(menuListStatus, "Menue geladen.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(menuListStatus, "Menue konnte nicht geladen werden.", "error");
+      }
+    }
+
+    async function saveMenuItem(payload, options) {
+      const resetAfterSave = !options || options.resetAfterSave !== false;
+      const successMessage = options && options.successMessage ? options.successMessage : "Eintrag gespeichert.";
+
+      setStatus(menuFormStatus, "Eintrag wird gespeichert ...", "");
+
+      try {
+        await requestJson("/menu-admin", {
+          method: "POST",
+          payload: Object.assign({
+            operation: "save"
+          }, payload)
+        });
+
+        await loadMenuItems({
+          silent: true
+        });
+
+        if (resetAfterSave) {
+          resetMenuForm();
+        } else {
+          syncMenuFormFromState();
+        }
+
+        setStatus(menuFormStatus, successMessage, "success");
+        setStatus(menuListStatus, "Menue aktualisiert.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(menuFormStatus, "Speichern fehlgeschlagen. Pruefe Eingaben und Backend.", "error");
+      }
+    }
+
+    async function deleteMenuItem(itemId) {
+      if (!window.confirm("Diesen Menue-Eintrag wirklich loeschen?")) {
+        return;
+      }
+
+      setStatus(menuListStatus, "Eintrag wird geloescht ...", "");
+
+      try {
+        await requestJson("/menu-admin", {
+          method: "POST",
+          payload: {
+            operation: "delete",
+            id: itemId
+          }
+        });
+
+        menuItems = menuItems.filter(function (item) {
+          return item.id !== itemId;
+        });
+
+        if (getMenuFormId() === itemId) {
+          resetMenuForm();
+        } else {
+          renderMenuAdminList();
+        }
+
+        setStatus(menuListStatus, "Eintrag geloescht.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(menuListStatus, "Loeschen fehlgeschlagen.", "error");
+      }
+    }
+
+    async function reorderMenuItems(nextItems) {
+      setStatus(menuListStatus, "Reihenfolge wird gespeichert ...", "");
+
+      try {
+        const result = await requestJson("/menu-admin", {
+          method: "POST",
+          payload: {
+            operation: "reorder",
+            items: nextItems.map(function (item, index) {
+              return {
+                id: item.id,
+                sortOrder: index
+              };
+            })
+          }
+        });
+
+        menuItems = (Array.isArray(result && result.items) ? result.items : [])
+          .map(normalizeMenuItem)
+          .sort(compareMenuItems);
+
+        renderMenuAdminList();
+        syncMenuFormFromState();
+        setStatus(menuListStatus, "Reihenfolge gespeichert.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(menuListStatus, "Reihenfolge konnte nicht gespeichert werden.", "error");
+      }
     }
 
     gateForm.addEventListener("submit", async function (event) {
       event.preventDefault();
-      setStatus(gateStatus, "Code wird gepr&uuml;ft ...", "");
+      setStatus(gateStatus, "Code wird geprueft ...", "");
 
       try {
         const trimmedCode = accessCode.value.trim();
@@ -392,18 +981,23 @@
 
         if (submittedHash === ACCESS_CODE_HASH) {
           currentAdminCode = trimmedCode;
-          setStatus(gateStatus, "Zugang gew&auml;hrt.", "success");
+          setStatus(gateStatus, "Zugang gewaehhrt.", "success");
           openAdminPanel();
+
           if (!backendConfigured()) {
             setStatus(messageStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+            setStatus(menuListStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+          } else {
+            await loadMenuItems();
           }
+
           return;
         }
 
         setStatus(gateStatus, "Falscher Code.", "error");
       } catch (error) {
         console.log(error);
-        setStatus(gateStatus, "Der Code konnte gerade nicht gepr&uuml;ft werden.", "error");
+        setStatus(gateStatus, "Der Code konnte gerade nicht geprueft werden.", "error");
       }
     });
 
@@ -413,6 +1007,7 @@
 
     adminMessageForm.addEventListener("submit", async function (event) {
       event.preventDefault();
+
       if (!currentAdminCode) {
         setStatus(messageStatus, "Bitte entsperre den Adminbereich erneut mit dem Code.", "warning");
         return;
@@ -431,10 +1026,13 @@
       const targetUrl = String(formData.get("target_url") || "../inbox/").trim();
 
       try {
-        const result = await postJson("/send", {
-          title,
-          body: messageText,
-          url: new URL(targetUrl, window.location.href).href
+        const result = await requestJson("/send", {
+          method: "POST",
+          payload: {
+            title: title,
+            body: messageText,
+            url: new URL(targetUrl, window.location.href).href
+          }
         });
 
         const sentCount = typeof result.sentCount === "number" ? result.sentCount : 0;
@@ -446,6 +1044,123 @@
         setStatus(messageStatus, "Senden fehlgeschlagen. Pruefe Backend, Code und Push-Abos.", "error");
       }
     });
+
+    menuResetButton.addEventListener("click", function () {
+      resetMenuForm();
+    });
+
+    refreshMenuItems.addEventListener("click", function () {
+      loadMenuItems();
+    });
+
+    menuItemForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      if (!currentAdminCode) {
+        setStatus(menuFormStatus, "Bitte entsperre den Adminbereich erneut mit dem Code.", "warning");
+        return;
+      }
+
+      if (!backendConfigured()) {
+        setStatus(menuFormStatus, "app-config.js ist noch nicht mit deinem Backend verbunden.", "warning");
+        return;
+      }
+
+      const formData = new FormData(menuItemForm);
+      const itemId = String(formData.get("id") || "").trim();
+      const title = String(formData.get("title") || "").trim();
+      const description = String(formData.get("description") || "").trim();
+
+      if (!title || !description) {
+        setStatus(menuFormStatus, "Titel und Beschreibung sind Pflichtfelder.", "warning");
+        return;
+      }
+
+      const existingItem = itemId ? getMenuItemById(itemId) : null;
+
+      await saveMenuItem({
+        id: itemId,
+        title: title,
+        description: description,
+        price: String(formData.get("price") || "").trim(),
+        category: String(formData.get("category") || "").trim(),
+        badge: String(formData.get("badge") || "").trim(),
+        imageUrl: String(formData.get("image_url") || "").trim(),
+        ctaLabel: String(formData.get("cta_label") || "").trim(),
+        ctaUrl: String(formData.get("cta_url") || "").trim(),
+        isActive: menuItemForm.elements.is_active.checked,
+        sortOrder: existingItem ? existingItem.sortOrder : menuItems.length
+      }, {
+        resetAfterSave: true,
+        successMessage: itemId ? "Eintrag gespeichert." : "Eintrag angelegt."
+      });
+    });
+
+    menuAdminList.addEventListener("click", async function (event) {
+      const button = event.target.closest("button[data-action]");
+
+      if (!button) {
+        return;
+      }
+
+      const action = button.dataset.action;
+      const itemId = button.dataset.id;
+      const item = getMenuItemById(itemId);
+
+      if (!item) {
+        return;
+      }
+
+      if (action === "edit") {
+        fillMenuForm(item, false);
+        return;
+      }
+
+      if (action === "toggle") {
+        await saveMenuItem({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          price: item.price,
+          category: item.category,
+          badge: item.badge,
+          imageUrl: item.imageUrl,
+          ctaLabel: item.ctaLabel,
+          ctaUrl: item.ctaUrl,
+          isActive: !item.isActive,
+          sortOrder: item.sortOrder
+        }, {
+          resetAfterSave: false,
+          successMessage: item.isActive ? "Eintrag ausgeblendet." : "Eintrag eingeblendet."
+        });
+        return;
+      }
+
+      if (action === "delete") {
+        await deleteMenuItem(item.id);
+        return;
+      }
+
+      if (action === "up" || action === "down") {
+        const sortedItems = menuItems.slice().sort(compareMenuItems);
+        const itemIndex = sortedItems.findIndex(function (entry) {
+          return entry.id === item.id;
+        });
+        const swapWith = action === "up" ? itemIndex - 1 : itemIndex + 1;
+
+        if (itemIndex < 0 || swapWith < 0 || swapWith >= sortedItems.length) {
+          return;
+        }
+
+        const nextItems = sortedItems.slice();
+        const currentItem = nextItems[itemIndex];
+        nextItems[itemIndex] = nextItems[swapWith];
+        nextItems[swapWith] = currentItem;
+        await reorderMenuItems(nextItems);
+      }
+    });
+
+    renderMenuAdminList();
   </script>
 </body>
 </html>

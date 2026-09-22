@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f1013">
+  <title>Winkelwerk Postfach</title>
+  <link rel="icon" type="image/png" href="../winkelwerlk.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <style>
+    :root {
+      color-scheme: dark light;
+      --bg: #f7f4ef;
+      --panel: rgba(255, 255, 255, 0.9);
+      --panel-border: rgba(0, 0, 0, 0.08);
+      --text: #151515;
+      --muted: #6f6a63;
+      --shadow: rgba(0, 0, 0, 0.12);
+      --accent: #ff4d4d;
+      --accent-hover: #ea3c3c;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1013;
+        --panel: rgba(20, 22, 28, 0.9);
+        --panel-border: rgba(255, 255, 255, 0.08);
+        --text: #f3f4f6;
+        --muted: #a6adb8;
+        --shadow: rgba(0, 0, 0, 0.34);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(255, 77, 77, 0.12), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      padding: 22px 14px 28px;
+    }
+
+    .shell {
+      width: min(100%, 900px);
+      margin: 0 auto;
+    }
+
+    .topbar,
+    .message-card,
+    .empty-state {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      box-shadow: 0 18px 42px var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar {
+      padding: 18px 18px 20px;
+      margin-bottom: 18px;
+    }
+
+    .topbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 42px);
+    }
+
+    .lead {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn,
+    .ghost-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.18s ease, background-color 0.18s ease, opacity 0.18s ease;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .ghost-btn {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--panel-border);
+    }
+
+    .ghost-btn:hover,
+    .ghost-btn:focus-visible {
+      background: rgba(127, 127, 127, 0.09);
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+      min-height: 20px;
+    }
+
+    .message-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .message-card,
+    .empty-state {
+      padding: 18px;
+    }
+
+    .message-card h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .message-meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .message-body {
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .message-card a {
+      display: inline-flex;
+      margin-top: 14px;
+      color: var(--accent);
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 700px) {
+      .topbar-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .actions {
+        width: 100%;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+  <main class="shell">
+    <section class="topbar">
+      <div class="topbar-row">
+        <div class="brand">
+          <img src="../winkelwerlk.png" alt="Winkelwerk">
+          <div>
+            <h1>Postfach</h1>
+            <p class="lead">Hier landen interne Winkelwerk-Nachrichten, die auf diesem Ger&auml;t angekommen sind.</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="refreshInbox" type="button">Aktualisieren</button>
+          <button class="ghost-btn" id="clearInbox" type="button">Leeren</button>
+          <a class="ghost-btn" href="../">Zur Startseite</a>
+        </div>
+      </div>
+
+      <p class="status" id="inboxStatus"></p>
+    </section>
+
+    <section class="message-list" id="messageList"></section>
+  </main>
+
+  <script>
+    const DB_NAME = "winkelwerk-inbox";
+    const STORE_NAME = "messages";
+    const messageList = document.getElementById("messageList");
+    const inboxStatus = document.getElementById("inboxStatus");
+    const refreshInbox = document.getElementById("refreshInbox");
+    const clearInbox = document.getElementById("clearInbox");
+
+    function openInboxDb() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+
+        request.onupgradeneeded = () => {
+          const db = request.result;
+
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            const store = db.createObjectStore(STORE_NAME, { keyPath: "id" });
+            store.createIndex("sentAt", "sentAt", { unique: false });
+          }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function getMessages() {
+      const db = await openInboxDb();
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, "readonly");
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+          const items = request.result.sort((left, right) => {
+            return String(right.sentAt).localeCompare(String(left.sentAt));
+          });
+
+          resolve(items);
+        };
+
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function clearMessages() {
+      const db = await openInboxDb();
+
+      await new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, "readwrite");
+        const store = transaction.objectStore(STORE_NAME);
+        store.clear();
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+      });
+    }
+
+    function formatDate(value) {
+      try {
+        return new Date(value).toLocaleString("de-DE", {
+          dateStyle: "medium",
+          timeStyle: "short"
+        });
+      } catch (error) {
+        return value;
+      }
+    }
+
+    function setStatus(text) {
+      inboxStatus.textContent = text;
+    }
+
+    function renderEmptyState() {
+      messageList.innerHTML = [
+        "<article class=\"empty-state\">",
+        "<p>Noch keine internen Nachrichten auf diesem Ger&auml;t gespeichert.</p>",
+        "<p>Aktiviere Push auf der Startseite und sende danach eine Nachricht aus dem Adminbereich.</p>",
+        "</article>"
+      ].join("");
+    }
+
+    function renderMessages(messages) {
+      if (!messages.length) {
+        renderEmptyState();
+        return;
+      }
+
+      messageList.innerHTML = messages.map((message) => {
+        const actionLink = message.url
+          ? "<a href=\"" + message.url + "\">Nachricht &ouml;ffnen</a>"
+          : "";
+
+        return [
+          "<article class=\"message-card\">",
+          "<h2>" + escapeHtml(message.title || "Winkelwerk") + "</h2>",
+          "<p class=\"message-meta\">" + escapeHtml(formatDate(message.sentAt || "")) + "</p>",
+          "<p class=\"message-body\">" + escapeHtml(message.body || "") + "</p>",
+          actionLink,
+          "</article>"
+        ].join("");
+      }).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    async function loadMessages() {
+      setStatus("Nachrichten werden geladen ...");
+
+      try {
+        const messages = await getMessages();
+        renderMessages(messages);
+        setStatus(messages.length ? messages.length + " Nachricht(en) geladen." : "Keine Nachrichten gespeichert.");
+      } catch (error) {
+        console.log(error);
+        setStatus("Das Postfach konnte nicht geladen werden.");
+      }
+    }
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data && event.data.type === "INBOX_UPDATED") {
+          loadMessages();
+        }
+      });
+    }
+
+    refreshInbox.addEventListener("click", () => {
+      loadMessages();
+    });
+
+    clearInbox.addEventListener("click", async () => {
+      try {
+        await clearMessages();
+
+        if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({
+            type: "CLEAR_INBOX_MESSAGES"
+          });
+        }
+
+        await loadMessages();
+      } catch (error) {
+        console.log(error);
+        setStatus("Das Postfach konnte nicht geleert werden.");
+      }
+    });
+
+    loadMessages();
+  </script>
+</body>
+</html>

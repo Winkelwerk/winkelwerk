@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#101114">
+  <meta name="color-scheme" content="light dark">
+  <title>Winkelwerk Admin</title>
+  <link rel="icon" type="image/png" href="../winkelwerlk.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../app-config.js"></script>
+
+  <style>
+    :root {
+      color-scheme: dark light;
+      --bg: #f7f4ef;
+      --panel: rgba(255, 255, 255, 0.9);
+      --panel-strong: #ffffff;
+      --text: #181818;
+      --muted: #6f6a63;
+      --border: rgba(0, 0, 0, 0.08);
+      --accent: #ff4d4d;
+      --accent-hover: #ea3c3c;
+      --shadow: rgba(0, 0, 0, 0.14);
+      --field-bg: #ffffff;
+      --field-border: #d9d3ca;
+      --success: #0f8f58;
+      --error: #c0392b;
+      --warning: #9a6700;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1013;
+        --panel: rgba(22, 24, 29, 0.9);
+        --panel-strong: #17191d;
+        --text: #f3f4f6;
+        --muted: #a8afb8;
+        --border: rgba(255, 255, 255, 0.09);
+        --shadow: rgba(0, 0, 0, 0.38);
+        --field-bg: #101217;
+        --field-border: #2c3038;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(255, 77, 77, 0.14), transparent 30%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.08)),
+        var(--bg);
+      color: var(--text);
+      padding: 28px 16px;
+    }
+
+    .shell {
+      width: min(100%, 980px);
+      margin: 0 auto;
+    }
+
+    .gate-panel,
+    .admin-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: 0 28px 60px var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .gate-panel {
+      width: min(100%, 520px);
+      margin: 8vh auto 0;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .brand {
+      width: min(280px, 70%);
+      display: block;
+      margin: 0 auto 22px;
+      border-radius: 18px;
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 46px);
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: clamp(24px, 3vw, 34px);
+      margin-bottom: 10px;
+    }
+
+    p {
+      line-height: 1.55;
+    }
+
+    .lead {
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      text-align: left;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 14px 15px;
+      border-radius: 14px;
+      border: 1px solid var(--field-border);
+      background: var(--field-bg);
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+    }
+
+    fieldset {
+      min-width: 0;
+      border: 1px solid var(--field-border);
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    legend {
+      padding: 0 6px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .period-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .period-choice {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(127, 127, 127, 0.06);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .period-choice input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .period-choice span {
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 1.45;
+    }
+
+    .btn,
+    .ghost-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.18s ease, opacity 0.18s ease;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .ghost-btn {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .ghost-btn:hover,
+    .ghost-btn:focus-visible {
+      background: rgba(127, 127, 127, 0.09);
+    }
+
+    .status {
+      min-height: 22px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .status.success {
+      color: var(--success);
+    }
+
+    .status.error {
+      color: var(--error);
+    }
+
+    .status.warning {
+      color: var(--warning);
+    }
+
+    .admin-panel {
+      display: none;
+      padding: 26px;
+    }
+
+    .admin-panel.is-open {
+      display: block;
+    }
+
+    .admin-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-kicker {
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 6px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .admin-section {
+      margin-top: 30px;
+      padding-top: 26px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-head {
+      margin-bottom: 20px;
+    }
+
+    .section-head h3 {
+      font-size: clamp(22px, 3vw, 30px);
+      margin-bottom: 10px;
+    }
+
+    .section-head .lead {
+      margin-bottom: 0;
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .editor-card,
+    .menu-library {
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: var(--panel-strong);
+    }
+
+    .settings-card {
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: var(--panel-strong);
+    }
+
+    .menu-library-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .small-btn {
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+
+    .check-field {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .check-field input {
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      margin: 0;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .menu-admin-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .menu-admin-item {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--field-bg);
+    }
+
+    .menu-admin-item.is-editing {
+      border-color: rgba(255, 77, 77, 0.45);
+      box-shadow: 0 0 0 1px rgba(255, 77, 77, 0.18);
+    }
+
+    .menu-admin-item.is-inactive {
+      opacity: 0.75;
+    }
+
+    .menu-admin-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .menu-admin-title {
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .menu-admin-meta,
+    .menu-admin-description,
+    .menu-admin-extra {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .subscription-admin-url {
+      word-break: break-word;
+    }
+
+    .menu-admin-tags,
+    .menu-admin-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .menu-admin-tags {
+      margin: 12px 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 77, 77, 0.1);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .tag.is-muted {
+      background: rgba(127, 127, 127, 0.12);
+      color: var(--muted);
+    }
+
+    .empty-box {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px dashed var(--field-border);
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .hint-box {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 77, 77, 0.08);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 18px 12px;
+      }
+
+      .gate-panel,
+      .admin-panel {
+        border-radius: 22px;
+      }
+
+      .gate-panel {
+        padding: 22px 18px;
+      }
+
+      .admin-panel {
+        padding: 18px;
+      }
+
+      .admin-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .menu-library-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+  <main class="shell">
+    <section class="gate-panel" id="gatePanel">
+      <img class="brand" src="../winkelwerlk.png" alt="Winkelwerk">
+      <h1>Admin-Zugang</h1>
+      <p class="lead">Diese Seite ist nur mit dem richtigen Code zug&auml;nglich.</p>
+
+      <form id="gateForm">
+        <label>
+          Zugangscode
+          <input id="accessCode" type="password" placeholder="Code eingeben" autocomplete="current-password" required>
+        </label>
+        <button class="btn" type="submit">Adminbereich &ouml;ffnen</button>
+        <p class="status" id="gateStatus"></p>
+      </form>
+    </section>
+
+    <section class="admin-panel" id="adminPanel">
+      <div class="admin-topbar">
+        <div>
+          <p class="admin-kicker">Winkelwerk Intern</p>
+          <h2>Nachrichten senden</h2>
+          <p class="lead">Von hier sendest du interne Website-Nachrichten an alle Geräte mit aktivem Winkelwerk-Push.</p>
+        </div>
+        <div class="actions">
+          <a class="ghost-btn small-btn" href="../mitarbeiter/">Mitarbeiterportal</a>
+          <button class="ghost-btn" id="lockAdmin" type="button">Abmelden</button>
+        </div>
+      </div>
+
+      <form id="adminMessageForm">
+        <div class="grid">
+          <label>
+            Titel
+            <input type="text" name="title" placeholder="z. B. Neue Wochenkarte" required>
+          </label>
+
+          <label>
+            Button / Ziel-Link
+            <input type="text" name="target_url" placeholder="../inbox/ oder https://..." value="../inbox/" required>
+          </label>
+        </div>
+
+        <label>
+          Nachricht
+          <textarea name="message_text" placeholder="Deine interne Nachricht..." required></textarea>
+        </label>
+
+        <button class="btn" type="submit">Nachricht senden</button>
+        <p class="status" id="messageStatus"></p>
+      </form>
+
+      <div class="hint-box">
+        Diese Seite sendet echte Web-Push-Nachrichten über dein Backend. Der sichtbare Zugangsschutz ist clientseitig, die eigentliche Sendefreigabe läuft über denselben Admin-Code auf dem Backend.
+      </div>
+
+      <div class="admin-section">
+        <div class="section-head">
+          <p class="admin-kicker">Push &Uuml;berblick</p>
+          <h3>Abonnenten verwalten</h3>
+          <p class="lead">Hier siehst du aktuell gespeicherte Push-Abos. Ohne Login-System lassen sich Ger&auml;t, Browser und Quelle erkennen, aber nicht sicher die konkrete Person.</p>
+        </div>
+
+        <div class="menu-library">
+          <div class="menu-library-topbar">
+            <div>
+              <h3>Aktive Push-Abos</h3>
+              <p class="lead">Einzelne Abonnenten kannst du hier direkt entfernen.</p>
+            </div>
+            <button class="ghost-btn small-btn" id="refreshSubscriptions" type="button">Neu laden</button>
+          </div>
+
+          <div class="menu-admin-list" id="subscriptionAdminList"></div>
+          <p class="status" id="subscriptionListStatus"></p>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <div class="section-head">
+          <p class="admin-kicker">Website Status</p>
+          <h3>Wartungsmodus</h3>
+          <p class="lead">Wenn der Wartungsmodus aktiv ist, sieht die Hauptseite statt des Inhalts einen grossen Hinweis, dass die Website gerade bearbeitet wird. Der Adminbereich bleibt weiter erreichbar.</p>
+        </div>
+
+        <div class="settings-card">
+          <form id="siteSettingsForm">
+            <label class="check-field">
+              <input type="checkbox" name="maintenance_mode">
+              <span>Wartungsmodus auf der Hauptseite aktivieren</span>
+            </label>
+
+            <button class="btn" type="submit">Status speichern</button>
+            <p class="status" id="siteSettingsStatus"></p>
+          </form>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <div class="section-head">
+          <p class="admin-kicker">Website Inhalt</p>
+          <h3>Men&uuml;, Poster &amp; Sticker verwalten</h3>
+          <p class="lead">Gerichte, Getr&auml;nke, Poster und Sticker anlegen, bearbeiten, ausblenden oder in der Reihenfolge verschieben. Poster und Sticker erscheinen automatisch auf ihrer eigenen Website-Seite.</p>
+        </div>
+
+        <div class="editor-grid">
+          <div class="editor-card">
+            <h3 id="menuEditorTitle">Neuen Website-Inhalt anlegen</h3>
+
+            <form id="menuItemForm">
+              <input type="hidden" name="id" value="">
+
+              <div class="grid">
+                <label>
+                  Typ
+                  <select name="item_type">
+                    <optgroup label="Gastronomie">
+                      <option value="food">Speise</option>
+                      <option value="drink">Getr&auml;nk</option>
+                    </optgroup>
+                    <optgroup label="Shop">
+                      <option value="poster">Poster</option>
+                      <option value="sticker">Sticker</option>
+                    </optgroup>
+                  </select>
+                </label>
+
+                <label>
+                  Titel
+                  <input type="text" name="title" placeholder="z. B. Smashburger" required>
+                </label>
+
+                <label>
+                  Preis
+                  <input type="text" name="price" placeholder="z. B. 14,90 EUR">
+                </label>
+
+                <label>
+                  Kategorie
+                  <input type="text" name="category" placeholder="z. B. Burger">
+                </label>
+
+                <fieldset id="menuPeriodFieldset">
+                  <legend>Karte / Zeitfenster</legend>
+                  <div class="period-grid">
+                    <label class="period-choice">
+                      <input type="checkbox" name="menu_periods" value="all_day" checked>
+                      <span>Ganzt&auml;gig sichtbar</span>
+                    </label>
+                    <label class="period-choice">
+                      <input type="checkbox" name="menu_periods" value="breakfast">
+                      <span>Fr&uuml;hst&uuml;ckskarte 09:00 - 12:00</span>
+                    </label>
+                    <label class="period-choice">
+                      <input type="checkbox" name="menu_periods" value="lunch">
+                      <span>Mittagskarte 12:00 - 17:00</span>
+                    </label>
+                    <label class="period-choice">
+                      <input type="checkbox" name="menu_periods" value="dinner">
+                      <span>Abendkarte 17:00 - 21:00</span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <label>
+                  Badge
+                  <input type="text" name="badge" placeholder="z. B. Bestseller">
+                </label>
+
+                <label>
+                  Bild-URL
+                  <input type="url" name="image_url" placeholder="https://...">
+                </label>
+
+                <label>
+                  Button-Label
+                  <input type="text" name="cta_label" placeholder="z. B. Details">
+                </label>
+
+                <label>
+                  Button-Link
+                  <input type="text" name="cta_url" placeholder="./kontakt oder https://...">
+                </label>
+              </div>
+
+              <label>
+                Beschreibung
+                <textarea name="description" placeholder="Kurze Beschreibung des Eintrags..." required></textarea>
+              </label>
+
+              <label class="check-field">
+                <input type="checkbox" name="is_active" checked>
+                <span>Eintrag auf der Website sichtbar schalten</span>
+              </label>
+
+              <div class="action-row">
+                <button class="btn" type="submit">Inhalt speichern</button>
+                <button class="ghost-btn" id="menuResetButton" type="button">Neu beginnen</button>
+              </div>
+
+              <p class="status" id="menuFormStatus"></p>
+            </form>
+          </div>
+
+          <div class="menu-library">
+            <div class="menu-library-topbar">
+              <div>
+                <h3>Vorhandene Inhalte</h3>
+                <p class="lead">Hier steuerst du Reihenfolge und Sichtbarkeit aller Men&uuml;- und Shop-Inhalte.</p>
+              </div>
+              <button class="ghost-btn small-btn" id="refreshMenuItems" type="button">Neu laden</button>
+            </div>
+
+            <div class="menu-admin-list" id="menuAdminList"></div>
+            <p class="status" id="menuListStatus"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <div class="section-head">
+          <p class="admin-kicker">Bestellungen</p>
+          <h3>Eingegangene Demo-Bestellungen</h3>
+          <p class="lead">Die Bestellseite schreibt hier ihre Bestellungen ins Backend. Du kannst Eintr&auml;ge ansehen und entfernen.</p>
+        </div>
+
+        <div class="menu-library">
+          <div class="menu-library-topbar">
+            <div>
+              <h3>Bestell&uuml;bersicht</h3>
+              <p class="lead">Jede Demo-Bestellung landet hier mit Positionen, Kontakt und Zeitstempel.</p>
+            </div>
+            <button class="ghost-btn small-btn" id="refreshOrders" type="button">Neu laden</button>
+          </div>
+
+          <div class="menu-admin-list" id="orderAdminList"></div>
+          <p class="status" id="orderListStatus"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const appConfig = window.WINKELWERK_APP_CONFIG || {};
+    const ACCESS_CODE_HASH = appConfig.adminCodeHash || "6209c99de88145d6dfd861fa1805e7e7cd1c7a1084d79f080f9dc5c8cf973a6e";
+    const API_BASE = String(appConfig.pushFunctionUrl || appConfig.pushApiBaseUrl || "").replace(/\/+$/, "");
+    const gateForm = document.getElementById("gateForm");
+    const gatePanel = document.getElementById("gatePanel");
+    const adminPanel = document.getElementById("adminPanel");
+    const gateStatus = document.getElementById("gateStatus");
+    const accessCode = document.getElementById("accessCode");
+    const lockAdmin = document.getElementById("lockAdmin");
+    const adminMessageForm = document.getElementById("adminMessageForm");
+    const messageStatus = document.getElementById("messageStatus");
+    const menuItemForm = document.getElementById("menuItemForm");
+    const menuFormStatus = document.getElementById("menuFormStatus");
+    const menuListStatus = document.getElementById("menuListStatus");
+    const menuAdminList = document.getElementById("menuAdminList");
+    const menuEditorTitle = document.getElementById("menuEditorTitle");
+    const menuResetButton = document.getElementById("menuResetButton");
+    const refreshMenuItems = document.getElementById("refreshMenuItems");
+    const siteSettingsForm = document.getElementById("siteSettingsForm");
+    const siteSettingsStatus = document.getElementById("siteSettingsStatus");
+    const refreshSubscriptions = document.getElementById("refreshSubscriptions");
+    const subscriptionAdminList = document.getElementById("subscriptionAdminList");
+    const subscriptionListStatus = document.getElementById("subscriptionListStatus");
+    const refreshOrders = document.getElementById("refreshOrders");
+    const orderAdminList = document.getElementById("orderAdminList");
+    const orderListStatus = document.getElementById("orderListStatus");
+    let currentAdminCode = "";
+    let menuItems = [];
+    let subscriptions = [];
+    let orders = [];
+
+    function setStatus(target, message, type) {
+      target.textContent = message;
+      target.className = "status" + (type ? " " + type : "");
+    }
+
+    async function sha256(value) {
+      const buffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+      return Array.from(new Uint8Array(buffer))
+        .map((part) => part.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    function openAdminPanel() {
+      gatePanel.classList.add("hidden");
+      adminPanel.classList.add("is-open");
+    }
+
+    function backendConfigured() {
+      return Boolean(API_BASE);
+    }
+
+    async function readErrorMessage(response) {
+      const contentType = response.headers.get("content-type") || "";
+
+      if (contentType.includes("application/json")) {
+        const result = await response.json().catch(() => null);
+
+        if (result && typeof result.error === "string" && result.error.trim()) {
+          return result.error.trim();
+        }
+      }
+
+      const errorText = await response.text().catch(() => "");
+      return errorText || "Request failed";
+    }
+
+    function describeSiteSettingsError(error, action) {
+      const errorMessage = String(error && error.message ? error.message : "");
+      const normalized = errorMessage.toLowerCase();
+      const migrationHint = "Bitte führe die Migration 20260429_site_settings.sql aus und deploye push-api neu.";
+
+      if (
+        normalized.includes("site_settings")
+        || normalized.includes("unknown action")
+        || normalized.includes("migration")
+      ) {
+        return action === "load"
+          ? "Wartungsmodus konnte nicht geladen werden. " + migrationHint
+          : "Wartungsmodus konnte nicht gespeichert werden. " + migrationHint;
+      }
+
+      return action === "load"
+        ? "Wartungsmodus konnte nicht geladen werden."
+        : "Wartungsmodus konnte nicht gespeichert werden.";
+    }
+
+    function describeSubscriptionsError(error, action) {
+      const errorMessage = String(error && error.message ? error.message : "");
+      const normalized = errorMessage.toLowerCase();
+      const deployHint = "Bitte deploye push-api neu, damit subscriptions-admin verfuegbar ist.";
+
+      if (
+        normalized.includes("method not allowed")
+        || normalized.includes("unknown action")
+        || normalized.includes("not found")
+      ) {
+        return action === "load"
+          ? "Push-Abonnenten konnten nicht geladen werden. " + deployHint
+          : "Abonnent konnte nicht entfernt werden. " + deployHint;
+      }
+
+      return action === "load"
+        ? "Push-Abonnenten konnten nicht geladen werden."
+        : "Abonnent konnte nicht entfernt werden.";
+    }
+
+    function describeOrdersError(error, action) {
+      const errorMessage = String(error && error.message ? error.message : "");
+      const normalized = errorMessage.toLowerCase();
+      const deployHint = "Bitte fuehre die neue Migration aus und deploye push-api neu.";
+
+      if (
+        normalized.includes("method not allowed")
+        || normalized.includes("unknown action")
+        || normalized.includes("not found")
+      ) {
+        return action === "load"
+          ? "Bestellungen konnten nicht geladen werden. " + deployHint
+          : "Bestellung konnte nicht entfernt werden. " + deployHint;
+      }
+
+      if (normalized.includes("order_requests")) {
+        return action === "load"
+          ? "Bestellungen konnten nicht geladen werden. " + deployHint
+          : "Bestellung konnte nicht entfernt werden. " + deployHint;
+      }
+
+      return action === "load"
+        ? "Bestellungen konnten nicht geladen werden."
+        : "Bestellung konnte nicht entfernt werden.";
+    }
+
+    async function requestJson(path, options) {
+      const method = options && options.method ? options.method : "GET";
+      const payload = options ? options.payload : undefined;
+      const headers = {};
+
+      if (currentAdminCode) {
+        headers["x-admin-code"] = currentAdminCode;
+      }
+
+      if (payload !== undefined) {
+        headers["Content-Type"] = "application/json";
+      }
+
+      const response = await fetch(API_BASE + path, {
+        method,
+        headers,
+        body: payload !== undefined ? JSON.stringify(payload) : undefined
+      });
+
+      if (!response.ok) {
+        const errorText = await readErrorMessage(response);
+        throw new Error(errorText || "Request failed");
+      }
+
+      const contentType = response.headers.get("content-type") || "";
+      return contentType.includes("application/json") ? response.json() : null;
+    }
+
+    function compareMenuItems(a, b) {
+      return Number(a.sortOrder || 0) - Number(b.sortOrder || 0);
+    }
+
+    function normalizeItemType(value) {
+      const normalized = String(value || "").trim().toLowerCase();
+
+      if (normalized === "drink" || normalized === "getraenk" || normalized === "getränk") {
+        return "drink";
+      }
+
+      if (normalized === "poster") {
+        return "poster";
+      }
+
+      if (normalized === "sticker" || normalized === "stickers") {
+        return "sticker";
+      }
+
+      return "food";
+    }
+
+    function formatItemTypeLabel(value) {
+      const itemType = normalizeItemType(value);
+
+      if (itemType === "drink") {
+        return "Getränk";
+      }
+
+      if (itemType === "poster") {
+        return "Poster";
+      }
+
+      if (itemType === "sticker") {
+        return "Sticker";
+      }
+
+      return "Speise";
+    }
+
+    function compareOrders(a, b) {
+      return getSortTimestamp(b.createdAt) - getSortTimestamp(a.createdAt) || Number(b.id || 0) - Number(a.id || 0);
+    }
+
+    function normalizeMenuPeriods(value) {
+      const rawValues = Array.isArray(value)
+        ? value
+        : typeof value === "string"
+          ? String(value).replace(/^\{|\}$/g, "").split(",")
+          : [value];
+
+      const uniqueValues = Array.from(new Set(
+        rawValues
+          .map(function (item) {
+            return String(item || "").trim().toLowerCase();
+          })
+          .filter(function (item) {
+            return ["all_day", "breakfast", "lunch", "dinner"].includes(item);
+          })
+      ));
+
+      if (!uniqueValues.length || uniqueValues.includes("all_day")) {
+        return ["all_day"];
+      }
+
+      return ["breakfast", "lunch", "dinner"].filter(function (item) {
+        return uniqueValues.includes(item);
+      });
+    }
+
+    function getPrimaryMenuPeriod(value) {
+      return normalizeMenuPeriods(value)[0] || "all_day";
+    }
+
+    function formatMenuPeriodLabel(value) {
+      const period = String(value || "").trim().toLowerCase();
+
+      if (period === "breakfast") {
+        return "Fruehstueck 09-12 Uhr";
+      }
+
+      if (period === "lunch") {
+        return "Mittag 12-17 Uhr";
+      }
+
+      if (period === "dinner") {
+        return "Abend 17-21 Uhr";
+      }
+
+      return "Ganztags";
+    }
+
+    function formatMenuPeriodLabels(value) {
+      return normalizeMenuPeriods(value).map(formatMenuPeriodLabel);
+    }
+
+    function getMenuPeriodInputs() {
+      return Array.from(menuItemForm.querySelectorAll('input[name="menu_periods"]'));
+    }
+
+    function setMenuPeriodInputs(value) {
+      const normalizedPeriods = normalizeMenuPeriods(value);
+
+      getMenuPeriodInputs().forEach(function (input) {
+        input.checked = normalizedPeriods.includes(input.value);
+      });
+    }
+
+    function readMenuPeriodsFromForm() {
+      return normalizeMenuPeriods(
+        getMenuPeriodInputs()
+          .filter(function (input) {
+            return input.checked;
+          })
+          .map(function (input) {
+            return input.value;
+          })
+      );
+    }
+
+    function handleMenuPeriodInputChange(changedInput) {
+      if (!changedInput) {
+        return;
+      }
+
+      const inputs = getMenuPeriodInputs();
+
+      if (changedInput.value === "all_day" && changedInput.checked) {
+        setMenuPeriodInputs(["all_day"]);
+        return;
+      }
+
+      if (changedInput.value !== "all_day" && changedInput.checked) {
+        inputs.forEach(function (input) {
+          if (input.value === "all_day") {
+            input.checked = false;
+          }
+        });
+      }
+
+      if (!readMenuPeriodsFromForm().length) {
+        setMenuPeriodInputs(["all_day"]);
+      }
+    }
+
+    function normalizeSiteSettings(settings) {
+      return {
+        maintenanceMode: Boolean(settings && settings.maintenanceMode),
+        maintenanceMessage: String(
+          settings && settings.maintenanceMessage
+            ? settings.maintenanceMessage
+            : "Website wird gerade bearbeitet. Bitte später erneut versuchen."
+        ).trim() || "Website wird gerade bearbeitet. Bitte später erneut versuchen."
+      };
+    }
+
+    function normalizeMenuItem(item) {
+      return {
+        id: String(item && item.id ? item.id : ""),
+        title: String(item && item.title ? item.title : "").trim(),
+        description: String(item && item.description ? item.description : "").trim(),
+        imageUrl: String(item && item.imageUrl ? item.imageUrl : "").trim(),
+        price: String(item && item.price ? item.price : "").trim(),
+        category: String(item && item.category ? item.category : "").trim(),
+        itemType: normalizeItemType(item && item.itemType ? item.itemType : item && item.type),
+        menuPeriod: getPrimaryMenuPeriod(item && (item.menuPeriods || item.menuPeriod)),
+        menuPeriods: normalizeMenuPeriods(item && (item.menuPeriods || item.menuPeriod)),
+        badge: String(item && item.badge ? item.badge : "").trim(),
+        ctaLabel: String(item && item.ctaLabel ? item.ctaLabel : "").trim(),
+        ctaUrl: String(item && item.ctaUrl ? item.ctaUrl : "").trim(),
+        isActive: item && item.isActive !== false,
+        sortOrder: Number.isFinite(Number(item && item.sortOrder)) ? Number(item.sortOrder) : 0
+      };
+    }
+
+    function getMenuFormId() {
+      return String(menuItemForm.elements.id.value || "");
+    }
+
+    function getMenuItemType() {
+      return normalizeItemType(menuItemForm.elements.item_type.value);
+    }
+
+    function setMenuItemType(value) {
+      menuItemForm.elements.item_type.value = normalizeItemType(value);
+      updateMenuPeriodVisibility();
+      setMenuEditorTitle(Boolean(getMenuFormId()));
+    }
+
+    function setMenuEditorTitle(editing) {
+      const isPrintProduct = ["poster", "sticker"].includes(getMenuItemType());
+
+      if (editing) {
+        menuEditorTitle.textContent = isPrintProduct ? "Poster oder Sticker bearbeiten" : "Eintrag bearbeiten";
+        return;
+      }
+
+      menuEditorTitle.textContent = isPrintProduct ? "Poster oder Sticker anlegen" : "Neuen Website-Inhalt anlegen";
+    }
+
+    function getMenuPeriodFieldset() {
+      return document.getElementById("menuPeriodFieldset");
+    }
+
+    function updateMenuPeriodVisibility() {
+      const fieldset = getMenuPeriodFieldset();
+      const usesMenuPeriods = getMenuItemType() === "food";
+
+      if (!fieldset) {
+        return;
+      }
+
+      fieldset.hidden = !usesMenuPeriods;
+      fieldset.setAttribute("aria-hidden", usesMenuPeriods ? "false" : "true");
+
+      getMenuPeriodInputs().forEach(function (input) {
+        input.disabled = !usesMenuPeriods;
+      });
+
+      if (!usesMenuPeriods) {
+        setMenuPeriodInputs(["all_day"]);
+      }
+    }
+
+    function createTag(label, muted) {
+      const tag = document.createElement("span");
+      tag.className = "tag" + (muted ? " is-muted" : "");
+      tag.textContent = label;
+      return tag;
+    }
+
+    function createActionButton(label, action, itemId) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "ghost-btn small-btn";
+      button.textContent = label;
+      button.dataset.action = action;
+      button.dataset.id = itemId;
+      return button;
+    }
+
+    function getMenuItemById(itemId) {
+      return menuItems.find(function (item) {
+        return item.id === itemId;
+      }) || null;
+    }
+
+    function normalizeSubscriptionRecord(item) {
+      return {
+        endpoint: String(item && item.endpoint ? item.endpoint : "").trim(),
+        site: String(item && item.site ? item.site : "").trim(),
+        page: String(item && item.page ? item.page : "").trim(),
+        userAgent: String(item && item.userAgent ? item.userAgent : "").trim(),
+        createdAt: String(item && item.createdAt ? item.createdAt : "").trim(),
+        updatedAt: String(item && item.updatedAt ? item.updatedAt : "").trim(),
+        lastSeenAt: String(item && item.lastSeenAt ? item.lastSeenAt : "").trim()
+      };
+    }
+
+    function normalizeOrderRecord(item) {
+      const items = Array.isArray(item && item.items) ? item.items : [];
+
+      return {
+        id: String(item && item.id ? item.id : ""),
+        customerName: String(item && item.customerName ? item.customerName : "").trim(),
+        customerContact: String(item && item.customerContact ? item.customerContact : "").trim(),
+        pickupTime: String(item && item.pickupTime ? item.pickupTime : "").trim(),
+        notes: String(item && item.notes ? item.notes : "").trim(),
+        sourcePage: String(item && item.sourcePage ? item.sourcePage : "").trim(),
+        totalText: String(item && item.totalText ? item.totalText : "").trim(),
+        totalValue: Number.isFinite(Number(item && item.totalValue)) ? Number(item.totalValue) : 0,
+        status: String(item && item.status ? item.status : "new").trim() || "new",
+        itemCount: Number.isFinite(Number(item && item.itemCount)) ? Number(item.itemCount) : items.reduce(function (sum, entry) {
+          return sum + Number(entry && entry.quantity ? entry.quantity : 0);
+        }, 0),
+        items: items.map(function (entry) {
+          const rawQuantity = Number(entry && entry.quantity ? entry.quantity : 1);
+          return {
+            id: String(entry && entry.id ? entry.id : "").trim(),
+            title: String(entry && entry.title ? entry.title : "").trim(),
+            itemType: normalizeItemType(entry && entry.itemType ? entry.itemType : entry && entry.type),
+            quantity: Number.isFinite(rawQuantity) ? Math.max(1, rawQuantity) : 1,
+            priceText: String(entry && entry.priceText ? entry.priceText : entry && entry.price ? entry.price : "").trim(),
+            lineTotalText: String(entry && entry.lineTotalText ? entry.lineTotalText : "").trim()
+          };
+        }),
+        createdAt: String(item && item.createdAt ? item.createdAt : "").trim(),
+        updatedAt: String(item && item.updatedAt ? item.updatedAt : "").trim()
+      };
+    }
+
+    function getSubscriptionByEndpoint(endpoint) {
+      return subscriptions.find(function (item) {
+        return item.endpoint === endpoint;
+      }) || null;
+    }
+
+    function getSortTimestamp(value) {
+      const timestamp = Date.parse(String(value || ""));
+      return Number.isFinite(timestamp) ? timestamp : 0;
+    }
+
+    function compareSubscriptions(a, b) {
+      return getSortTimestamp(b.lastSeenAt || b.createdAt) - getSortTimestamp(a.lastSeenAt || a.createdAt);
+    }
+
+    function formatDateTime(value) {
+      const timestamp = Date.parse(String(value || ""));
+
+      if (!Number.isFinite(timestamp)) {
+        return "unbekannt";
+      }
+
+      return new Intl.DateTimeFormat("de-DE", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(new Date(timestamp));
+    }
+
+    function formatCurrency(value) {
+      const amount = Number(value);
+      const normalizedAmount = Number.isFinite(amount) ? amount : 0;
+
+      return new Intl.NumberFormat("de-DE", {
+        style: "currency",
+        currency: "EUR"
+      }).format(normalizedAmount);
+    }
+
+    function getBrowserName(userAgent) {
+      const normalized = String(userAgent || "");
+
+      if (!normalized) {
+        return "";
+      }
+
+      if (/edg\//i.test(normalized)) {
+        return "Microsoft Edge";
+      }
+
+      if (/opr\//i.test(normalized) || /opera/i.test(normalized)) {
+        return "Opera";
+      }
+
+      if (/firefox\//i.test(normalized)) {
+        return "Firefox";
+      }
+
+      if (/samsungbrowser/i.test(normalized)) {
+        return "Samsung Internet";
+      }
+
+      if (/chrome\//i.test(normalized) && !/edg\//i.test(normalized) && !/opr\//i.test(normalized)) {
+        return "Chrome";
+      }
+
+      if (/safari\//i.test(normalized) && !/chrome\//i.test(normalized)) {
+        return "Safari";
+      }
+
+      return "Browser";
+    }
+
+    function getPlatformName(userAgent) {
+      const normalized = String(userAgent || "");
+
+      if (!normalized) {
+        return "";
+      }
+
+      if (/iphone|ipad|ipod/i.test(normalized)) {
+        return "iPhone oder iPad";
+      }
+
+      if (/android/i.test(normalized)) {
+        return "Android";
+      }
+
+      if (/windows/i.test(normalized)) {
+        return "Windows";
+      }
+
+      if (/mac os x|macintosh/i.test(normalized)) {
+        return "macOS";
+      }
+
+      if (/linux/i.test(normalized)) {
+        return "Linux";
+      }
+
+      return "";
+    }
+
+    function describeSubscriptionDevice(item) {
+      const browser = getBrowserName(item.userAgent);
+      const platform = getPlatformName(item.userAgent);
+
+      if (browser && platform) {
+        return browser + " auf " + platform;
+      }
+
+      if (browser) {
+        return browser;
+      }
+
+      if (platform) {
+        return platform;
+      }
+
+      return "Unbekanntes Geraet";
+    }
+
+    function formatSubscriptionHost(item) {
+      try {
+        return item.site ? new URL(item.site).hostname : window.location.hostname;
+      } catch (error) {
+        return item.site || window.location.hostname;
+      }
+    }
+
+    function formatSubscriptionPage(item) {
+      if (!item.page) {
+        return "";
+      }
+
+      try {
+        const pageUrl = new URL(item.page, item.site || window.location.origin);
+        return pageUrl.pathname + pageUrl.search;
+      } catch (error) {
+        return item.page;
+      }
+    }
+
+    function formatEndpointSnippet(endpoint) {
+      try {
+        const endpointUrl = new URL(endpoint);
+        const parts = endpointUrl.pathname.split("/").filter(Boolean);
+        const tail = parts.length ? parts[parts.length - 1] : endpointUrl.hostname;
+        return endpointUrl.hostname + " / ..." + tail.slice(-22);
+      } catch (error) {
+        return endpoint.length > 42 ? "..." + endpoint.slice(-42) : endpoint;
+      }
+    }
+
+    function renderSubscriptionAdminList() {
+      subscriptionAdminList.replaceChildren();
+
+      if (!subscriptions.length) {
+        const emptyBox = document.createElement("div");
+        emptyBox.className = "empty-box";
+        emptyBox.textContent = "Noch keine aktiven Push-Abonnenten gespeichert.";
+        subscriptionAdminList.appendChild(emptyBox);
+        return;
+      }
+
+      subscriptions.forEach(function (item) {
+        const article = document.createElement("article");
+        article.className = "menu-admin-item";
+
+        const header = document.createElement("div");
+        header.className = "menu-admin-header";
+
+        const titleWrap = document.createElement("div");
+        const title = document.createElement("h4");
+        title.className = "menu-admin-title";
+        title.textContent = describeSubscriptionDevice(item);
+
+        const meta = document.createElement("p");
+        meta.className = "menu-admin-meta";
+        meta.textContent = "Zuletzt gesehen: " + formatDateTime(item.lastSeenAt);
+
+        titleWrap.appendChild(title);
+        titleWrap.appendChild(meta);
+        header.appendChild(titleWrap);
+        header.appendChild(createTag("Aktiv", false));
+        article.appendChild(header);
+
+        const tags = document.createElement("div");
+        tags.className = "menu-admin-tags";
+        tags.appendChild(createTag(formatSubscriptionHost(item), false));
+
+        const pageLabel = formatSubscriptionPage(item);
+
+        if (pageLabel) {
+          tags.appendChild(createTag(pageLabel, true));
+        }
+
+        article.appendChild(tags);
+
+        const description = document.createElement("p");
+        description.className = "menu-admin-description";
+        description.textContent = "Abonniert am " + formatDateTime(item.createdAt) + ".";
+        article.appendChild(description);
+
+        if (item.endpoint) {
+          const extra = document.createElement("p");
+          extra.className = "menu-admin-extra subscription-admin-url";
+          extra.textContent = "Endpoint: " + formatEndpointSnippet(item.endpoint);
+          article.appendChild(extra);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "menu-admin-actions";
+        actions.appendChild(createActionButton("Abonnent entfernen", "delete-subscription", item.endpoint));
+        article.appendChild(actions);
+
+        subscriptionAdminList.appendChild(article);
+      });
+    }
+
+    function getOrderById(orderId) {
+      return orders.find(function (item) {
+        return String(item.id) === String(orderId);
+      }) || null;
+    }
+
+    function formatOrderItemSummary(item) {
+      const rawQuantity = Number(item && item.quantity ? item.quantity : 1);
+      const quantity = Number.isFinite(rawQuantity) ? Math.max(1, rawQuantity) : 1;
+      const title = String(item && item.title ? item.title : "").trim() || "Unbekannte Position";
+      const priceText = String(item && item.priceText ? item.priceText : "").trim();
+      const lineTotalText = String(item && item.lineTotalText ? item.lineTotalText : "").trim();
+      const parts = [
+        quantity > 1 ? quantity + "x" : "",
+        title,
+        priceText ? "@ " + priceText : "",
+        lineTotalText ? "(" + lineTotalText + ")" : ""
+      ].filter(Boolean);
+
+      return parts.join(" ");
+    }
+
+    function renderOrderAdminList() {
+      orderAdminList.replaceChildren();
+
+      if (!orders.length) {
+        const emptyBox = document.createElement("div");
+        emptyBox.className = "empty-box";
+        emptyBox.textContent = "Noch keine Bestellungen vorhanden.";
+        orderAdminList.appendChild(emptyBox);
+        return;
+      }
+
+      const sortedOrders = orders.slice().sort(compareOrders);
+
+      sortedOrders.forEach(function (order) {
+        const article = document.createElement("article");
+        article.className = "menu-admin-item";
+
+        if (order.status && order.status !== "new") {
+          article.classList.add("is-inactive");
+        }
+
+        const header = document.createElement("div");
+        header.className = "menu-admin-header";
+
+        const titleWrap = document.createElement("div");
+        const title = document.createElement("h4");
+        title.className = "menu-admin-title";
+        title.textContent = order.customerName || "Ohne Namen";
+
+        const meta = document.createElement("p");
+        meta.className = "menu-admin-meta";
+        meta.textContent = [
+          formatDateTime(order.createdAt),
+          order.customerContact ? "Kontakt: " + order.customerContact : "",
+          order.pickupTime ? "Wunschuhrzeit: " + order.pickupTime : "",
+          order.sourcePage ? "Quelle: " + order.sourcePage : ""
+        ].filter(Boolean).join(" · ");
+
+        titleWrap.appendChild(title);
+        titleWrap.appendChild(meta);
+        header.appendChild(titleWrap);
+        header.appendChild(createTag(order.status === "new" ? "Neu" : order.status, order.status !== "new"));
+        article.appendChild(header);
+
+        const tags = document.createElement("div");
+        tags.className = "menu-admin-tags";
+        tags.appendChild(createTag((order.itemCount || 0) + " Positionen", false));
+        tags.appendChild(createTag(order.totalText || formatCurrency(order.totalValue), false));
+        article.appendChild(tags);
+
+        const description = document.createElement("p");
+        description.className = "menu-admin-description";
+        description.textContent = order.items.length
+          ? order.items.map(formatOrderItemSummary).join(" · ")
+          : "Keine Positionen gespeichert.";
+        article.appendChild(description);
+
+        if (order.notes) {
+          const extra = document.createElement("p");
+          extra.className = "menu-admin-extra";
+          extra.textContent = "Notiz: " + order.notes;
+          article.appendChild(extra);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "menu-admin-actions";
+        actions.appendChild(createActionButton("Bestellung löschen", "delete-order", String(order.id)));
+        article.appendChild(actions);
+
+        orderAdminList.appendChild(article);
+      });
+    }
+
+    function renderMenuAdminList() {
+      menuAdminList.replaceChildren();
+
+      if (!menuItems.length) {
+        const emptyBox = document.createElement("div");
+        emptyBox.className = "empty-box";
+        emptyBox.textContent = "Noch keine Website-Inhalte vorhanden. Lege jetzt den ersten Eintrag an.";
+        menuAdminList.appendChild(emptyBox);
+        return;
+      }
+
+      const activeFormId = getMenuFormId();
+      const sortedItems = menuItems.slice().sort(compareMenuItems);
+
+      sortedItems.forEach(function (item, index) {
+        const article = document.createElement("article");
+        article.className = "menu-admin-item";
+
+        if (!item.isActive) {
+          article.classList.add("is-inactive");
+        }
+
+        if (item.id === activeFormId) {
+          article.classList.add("is-editing");
+        }
+
+        const header = document.createElement("div");
+        header.className = "menu-admin-header";
+
+        const titleWrap = document.createElement("div");
+        const title = document.createElement("h4");
+        title.className = "menu-admin-title";
+        title.textContent = item.title || "Ohne Titel";
+
+        const meta = document.createElement("p");
+        meta.className = "menu-admin-meta";
+        meta.textContent = "Position " + (index + 1) + (item.price ? " - " + item.price : "");
+
+        titleWrap.appendChild(title);
+        titleWrap.appendChild(meta);
+
+        header.appendChild(titleWrap);
+        header.appendChild(createTag(item.isActive ? "Live" : "Ausgeblendet", !item.isActive));
+        header.appendChild(createTag(formatItemTypeLabel(item.itemType), false));
+        article.appendChild(header);
+
+        const showMenuPeriods = item.itemType === "food";
+
+        if ((showMenuPeriods && item.menuPeriods && item.menuPeriods.length) || item.category || item.badge) {
+          const tags = document.createElement("div");
+          tags.className = "menu-admin-tags";
+
+          if (showMenuPeriods) {
+            formatMenuPeriodLabels(item.menuPeriods).forEach(function (label) {
+              const muted = item.menuPeriods.length === 1 && item.menuPeriods[0] === "all_day";
+              tags.appendChild(createTag(label, muted));
+            });
+          }
+
+          if (item.category) {
+            tags.appendChild(createTag(item.category, false));
+          }
+
+          if (item.badge) {
+            tags.appendChild(createTag(item.badge, false));
+          }
+
+          article.appendChild(tags);
+        }
+
+        const description = document.createElement("p");
+        description.className = "menu-admin-description";
+        description.textContent = item.description;
+        article.appendChild(description);
+
+        if (item.imageUrl || item.ctaLabel || item.ctaUrl) {
+          const extra = document.createElement("p");
+          extra.className = "menu-admin-extra";
+          extra.textContent = [
+            item.imageUrl ? "Bild hinterlegt" : "",
+            item.ctaLabel ? "Button: " + item.ctaLabel : "",
+            item.ctaUrl ? "Link gesetzt" : ""
+          ].filter(Boolean).join(" - ");
+          article.appendChild(extra);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "menu-admin-actions";
+        actions.appendChild(createActionButton("Bearbeiten", "edit", item.id));
+        actions.appendChild(createActionButton("Hoch", "up", item.id));
+        actions.appendChild(createActionButton("Runter", "down", item.id));
+        actions.appendChild(createActionButton(item.isActive ? "Ausblenden" : "Einblenden", "toggle", item.id));
+        actions.appendChild(createActionButton("Löschen", "delete", item.id));
+        article.appendChild(actions);
+
+        menuAdminList.appendChild(article);
+      });
+    }
+
+    function fillMenuForm(item, preserveStatus) {
+      menuItemForm.elements.id.value = item.id;
+      setMenuItemType(item.itemType);
+      menuItemForm.elements.title.value = item.title;
+      menuItemForm.elements.price.value = item.price;
+      menuItemForm.elements.category.value = item.category;
+      setMenuPeriodInputs(item.menuPeriods);
+      menuItemForm.elements.badge.value = item.badge;
+      menuItemForm.elements.image_url.value = item.imageUrl;
+      menuItemForm.elements.cta_label.value = item.ctaLabel;
+      menuItemForm.elements.cta_url.value = item.ctaUrl;
+      menuItemForm.elements.description.value = item.description;
+      menuItemForm.elements.is_active.checked = Boolean(item.isActive);
+      updateMenuPeriodVisibility();
+      setMenuEditorTitle(true);
+
+      if (!preserveStatus) {
+        setStatus(menuFormStatus, "Eintrag wird bearbeitet.", "");
+      }
+
+      renderMenuAdminList();
+
+      if (!preserveStatus) {
+        menuItemForm.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }
+    }
+
+    function resetMenuForm() {
+      menuItemForm.reset();
+      menuItemForm.elements.id.value = "";
+      setMenuItemType("food");
+      menuItemForm.elements.is_active.checked = true;
+      setMenuPeriodInputs(["all_day"]);
+      updateMenuPeriodVisibility();
+      setMenuEditorTitle(false);
+      setStatus(menuFormStatus, "", "");
+      renderMenuAdminList();
+    }
+
+    function syncMenuFormFromState() {
+      const itemId = getMenuFormId();
+
+      if (!itemId) {
+        renderMenuAdminList();
+        return;
+      }
+
+      const freshItem = getMenuItemById(itemId);
+
+      if (!freshItem) {
+        resetMenuForm();
+        return;
+      }
+
+      fillMenuForm(freshItem, true);
+    }
+
+    function lockAdminPanel() {
+      currentAdminCode = "";
+      menuItems = [];
+      subscriptions = [];
+      orders = [];
+      adminPanel.classList.remove("is-open");
+      gatePanel.classList.remove("hidden");
+      accessCode.value = "";
+      setStatus(gateStatus, "", "");
+      setStatus(messageStatus, "", "");
+      setStatus(menuListStatus, "", "");
+      setStatus(siteSettingsStatus, "", "");
+      setStatus(subscriptionListStatus, "", "");
+      setStatus(orderListStatus, "", "");
+      siteSettingsForm.reset();
+      resetMenuForm();
+      renderMenuAdminList();
+      renderSubscriptionAdminList();
+      renderOrderAdminList();
+    }
+
+    async function loadSiteSettingsAdmin(options) {
+      const silent = options && options.silent;
+
+      if (!backendConfigured() || !currentAdminCode) {
+        return;
+      }
+
+      if (!silent) {
+        setStatus(siteSettingsStatus, "Status wird geladen ...", "");
+      }
+
+      try {
+        const result = await requestJson("/site-settings");
+        const settings = normalizeSiteSettings(result && result.settings ? result.settings : {});
+        const storageReady = result ? result.storageReady !== false : true;
+        siteSettingsForm.elements.maintenance_mode.checked = settings.maintenanceMode;
+
+        if (!storageReady) {
+          setStatus(
+            siteSettingsStatus,
+            "Standardwerte geladen. Bitte führe die Migration 20260429_site_settings.sql aus und deploye push-api neu.",
+            "warning"
+          );
+          return;
+        }
+
+        setStatus(siteSettingsStatus, "Status geladen.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(siteSettingsStatus, describeSiteSettingsError(error, "load"), "error");
+      }
+    }
+
+    async function saveSiteSettingsAdmin() {
+      if (!currentAdminCode) {
+        setStatus(siteSettingsStatus, "Bitte entsperre den Adminbereich erneut mit dem Code.", "warning");
+        return;
+      }
+
+      if (!backendConfigured()) {
+        setStatus(siteSettingsStatus, "app-config.js ist noch nicht mit deinem Backend verbunden.", "warning");
+        return;
+      }
+
+      setStatus(siteSettingsStatus, "Status wird gespeichert ...", "");
+
+      try {
+        const result = await requestJson("/site-settings-admin", {
+          method: "POST",
+          payload: {
+            maintenanceMode: siteSettingsForm.elements.maintenance_mode.checked
+          }
+        });
+
+        const settings = normalizeSiteSettings(result && result.settings ? result.settings : {});
+        siteSettingsForm.elements.maintenance_mode.checked = settings.maintenanceMode;
+        setStatus(
+          siteSettingsStatus,
+          settings.maintenanceMode ? "Wartungsmodus aktiviert." : "Wartungsmodus deaktiviert.",
+          "success"
+        );
+      } catch (error) {
+        console.log(error);
+        setStatus(siteSettingsStatus, describeSiteSettingsError(error, "save"), "error");
+      }
+    }
+
+    async function loadSubscriptions(options) {
+      const silent = options && options.silent;
+
+      if (!backendConfigured()) {
+        subscriptions = [];
+        renderSubscriptionAdminList();
+        setStatus(subscriptionListStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+        return;
+      }
+
+      if (!currentAdminCode) {
+        return;
+      }
+
+      if (!silent) {
+        setStatus(subscriptionListStatus, "Abonnenten werden geladen ...", "");
+      }
+
+      try {
+        const result = await requestJson("/subscriptions-admin");
+        subscriptions = (Array.isArray(result && result.subscriptions) ? result.subscriptions : [])
+          .map(normalizeSubscriptionRecord)
+          .filter(function (item) {
+            return Boolean(item.endpoint);
+          })
+          .sort(compareSubscriptions);
+
+        renderSubscriptionAdminList();
+
+        if (!subscriptions.length) {
+          setStatus(subscriptionListStatus, "Noch keine aktiven Push-Abos gespeichert.", "");
+          return;
+        }
+
+        setStatus(subscriptionListStatus, subscriptions.length + " Abonnent(en) geladen.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(subscriptionListStatus, describeSubscriptionsError(error, "load"), "error");
+      }
+    }
+
+    async function deleteSubscription(endpoint) {
+      const item = getSubscriptionByEndpoint(endpoint);
+      const label = item ? describeSubscriptionDevice(item) : "diesen Abonnenten";
+
+      if (!window.confirm(label + " wirklich aus den Push-Abos entfernen?")) {
+        return;
+      }
+
+      setStatus(subscriptionListStatus, "Abonnent wird entfernt ...", "");
+
+      try {
+        await requestJson("/subscriptions-admin", {
+          method: "POST",
+          payload: {
+            operation: "delete",
+            endpoint: endpoint
+          }
+        });
+
+        subscriptions = subscriptions.filter(function (entry) {
+          return entry.endpoint !== endpoint;
+        });
+
+        renderSubscriptionAdminList();
+        setStatus(subscriptionListStatus, "Abonnent entfernt.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(subscriptionListStatus, describeSubscriptionsError(error, "delete"), "error");
+      }
+    }
+
+    async function loadOrders(options) {
+      const silent = options && options.silent;
+
+      if (!backendConfigured()) {
+        orders = [];
+        renderOrderAdminList();
+        setStatus(orderListStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+        return;
+      }
+
+      if (!currentAdminCode) {
+        return;
+      }
+
+      if (!silent) {
+        setStatus(orderListStatus, "Bestellungen werden geladen ...", "");
+      }
+
+      try {
+        const result = await requestJson("/orders-admin");
+        const storageReady = result ? result.storageReady !== false : true;
+        orders = (Array.isArray(result && result.orders) ? result.orders : [])
+          .map(normalizeOrderRecord)
+          .sort(compareOrders);
+
+        renderOrderAdminList();
+
+        if (!storageReady) {
+          setStatus(
+            orderListStatus,
+            "Bestellungen geladen. Bitte fuehre die neue Migration aus und deploye push-api neu.",
+            "warning"
+          );
+          return;
+        }
+
+        if (!orders.length) {
+          setStatus(orderListStatus, "Noch keine Bestellungen vorhanden.", "");
+          return;
+        }
+
+        setStatus(orderListStatus, orders.length + " Bestellung(en) geladen.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(orderListStatus, describeOrdersError(error, "load"), "error");
+      }
+    }
+
+    async function deleteOrder(orderId) {
+      const item = getOrderById(orderId);
+      const label = item ? item.customerName : "diese Bestellung";
+
+      if (!window.confirm(label + " wirklich loeschen?")) {
+        return;
+      }
+
+      setStatus(orderListStatus, "Bestellung wird entfernt ...", "");
+
+      try {
+        await requestJson("/orders-admin", {
+          method: "POST",
+          payload: {
+            operation: "delete",
+            id: orderId
+          }
+        });
+
+        orders = orders.filter(function (entry) {
+          return String(entry.id) !== String(orderId);
+        });
+
+        renderOrderAdminList();
+        setStatus(orderListStatus, "Bestellung entfernt.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(orderListStatus, describeOrdersError(error, "delete"), "error");
+      }
+    }
+
+    async function loadMenuItems(options) {
+      const silent = options && options.silent;
+
+      if (!backendConfigured()) {
+        menuItems = [];
+        renderMenuAdminList();
+        setStatus(menuListStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+        return;
+      }
+
+      if (!currentAdminCode) {
+        return;
+      }
+
+      if (!silent) {
+        setStatus(menuListStatus, "Menü wird geladen ...", "");
+      }
+
+      try {
+        const result = await requestJson("/menu-admin");
+        const rawItems = Array.isArray(result && result.items) ? result.items : [];
+        const menuPeriodsAvailable = rawItems.some(function (item) {
+          return item && Object.prototype.hasOwnProperty.call(item, "menuPeriods");
+        });
+
+        menuItems = rawItems
+          .map(normalizeMenuItem)
+          .sort(compareMenuItems);
+
+        renderMenuAdminList();
+        syncMenuFormFromState();
+
+        if (!menuItems.length) {
+          setStatus(menuListStatus, "Noch keine Website-Inhalte vorhanden.", "");
+          return;
+        }
+
+        if (!menuPeriodsAvailable) {
+          setStatus(menuListStatus, "Menü geladen. Mehrfach-Zeitfenster werden erst nach Migration 20260525193000_menu_period_arrays.sql und neuem push-api Deploy aktiv.", "warning");
+          return;
+        }
+
+        setStatus(menuListStatus, "Website-Inhalte geladen.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(menuListStatus, "Menü konnte nicht geladen werden.", "error");
+      }
+    }
+
+    async function saveMenuItem(payload, options) {
+      const resetAfterSave = !options || options.resetAfterSave !== false;
+      const successMessage = options && options.successMessage ? options.successMessage : "Eintrag gespeichert.";
+
+      setStatus(menuFormStatus, "Eintrag wird gespeichert ...", "");
+
+      try {
+        await requestJson("/menu-admin", {
+          method: "POST",
+          payload: Object.assign({
+            operation: "save"
+          }, payload)
+        });
+
+        await loadMenuItems({
+          silent: true
+        });
+
+        if (resetAfterSave) {
+          resetMenuForm();
+        } else {
+          syncMenuFormFromState();
+        }
+
+        setStatus(menuFormStatus, successMessage, "success");
+        setStatus(menuListStatus, "Website-Inhalte aktualisiert.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(menuFormStatus, "Speichern fehlgeschlagen. Prüfe Eingaben und Backend.", "error");
+      }
+    }
+
+    async function deleteMenuItem(itemId) {
+      if (!window.confirm("Diesen Menü-Eintrag wirklich löschen?")) {
+        return;
+      }
+
+      setStatus(menuListStatus, "Eintrag wird gelöscht ...", "");
+
+      try {
+        await requestJson("/menu-admin", {
+          method: "POST",
+          payload: {
+            operation: "delete",
+            id: itemId
+          }
+        });
+
+        menuItems = menuItems.filter(function (item) {
+          return item.id !== itemId;
+        });
+
+        if (getMenuFormId() === itemId) {
+          resetMenuForm();
+        } else {
+          renderMenuAdminList();
+        }
+
+        setStatus(menuListStatus, "Eintrag gelöscht.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(menuListStatus, "Löschen fehlgeschlagen.", "error");
+      }
+    }
+
+    async function reorderMenuItems(nextItems) {
+      setStatus(menuListStatus, "Reihenfolge wird gespeichert ...", "");
+
+      try {
+        const result = await requestJson("/menu-admin", {
+          method: "POST",
+          payload: {
+            operation: "reorder",
+            items: nextItems.map(function (item, index) {
+              return {
+                id: item.id,
+                sortOrder: index
+              };
+            })
+          }
+        });
+
+        menuItems = (Array.isArray(result && result.items) ? result.items : [])
+          .map(normalizeMenuItem)
+          .sort(compareMenuItems);
+
+        renderMenuAdminList();
+        syncMenuFormFromState();
+        setStatus(menuListStatus, "Reihenfolge gespeichert.", "success");
+      } catch (error) {
+        console.log(error);
+        setStatus(menuListStatus, "Reihenfolge konnte nicht gespeichert werden.", "error");
+      }
+    }
+
+    gateForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      setStatus(gateStatus, "Code wird geprüft ...", "");
+
+      try {
+        const trimmedCode = accessCode.value.trim();
+        const submittedHash = await sha256(trimmedCode);
+
+        if (submittedHash === ACCESS_CODE_HASH) {
+          currentAdminCode = trimmedCode;
+          setStatus(gateStatus, "Zugang gewährt.", "success");
+          openAdminPanel();
+
+          if (!backendConfigured()) {
+            setStatus(messageStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+            setStatus(menuListStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+            setStatus(siteSettingsStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+            setStatus(subscriptionListStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+            setStatus(orderListStatus, "Backend fehlt: Trage zuerst die Push-API in app-config.js ein.", "warning");
+          } else {
+            await Promise.all([
+              loadMenuItems(),
+              loadSiteSettingsAdmin(),
+              loadSubscriptions(),
+              loadOrders()
+            ]);
+          }
+
+          return;
+        }
+
+        setStatus(gateStatus, "Falscher Code.", "error");
+      } catch (error) {
+        console.log(error);
+        setStatus(gateStatus, "Der Code konnte gerade nicht geprüft werden.", "error");
+      }
+    });
+
+    lockAdmin.addEventListener("click", function () {
+      lockAdminPanel();
+    });
+
+    adminMessageForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      if (!currentAdminCode) {
+        setStatus(messageStatus, "Bitte entsperre den Adminbereich erneut mit dem Code.", "warning");
+        return;
+      }
+
+      if (!backendConfigured()) {
+        setStatus(messageStatus, "app-config.js ist noch nicht mit deinem Backend verbunden.", "warning");
+        return;
+      }
+
+      setStatus(messageStatus, "Interne Nachricht wird gesendet ...", "");
+
+      const formData = new FormData(adminMessageForm);
+      const title = String(formData.get("title") || "").trim();
+      const messageText = String(formData.get("message_text") || "").trim();
+      const targetUrl = String(formData.get("target_url") || "../inbox/").trim();
+
+      try {
+        const result = await requestJson("/send", {
+          method: "POST",
+          payload: {
+            title: title,
+            body: messageText,
+            url: new URL(targetUrl, window.location.href).href
+          }
+        });
+
+        const sentCount = typeof result.sentCount === "number" ? result.sentCount : 0;
+        setStatus(messageStatus, "Nachricht erfolgreich an " + sentCount + " Gerät(e) gesendet.", "success");
+        adminMessageForm.reset();
+        adminMessageForm.elements.target_url.value = "../inbox/";
+      } catch (error) {
+        console.log(error);
+        setStatus(messageStatus, "Senden fehlgeschlagen. Prüfe Backend, Code und Push-Abos.", "error");
+      }
+    });
+
+    menuResetButton.addEventListener("click", function () {
+      resetMenuForm();
+    });
+
+    refreshMenuItems.addEventListener("click", function () {
+      loadMenuItems();
+    });
+
+    refreshSubscriptions.addEventListener("click", function () {
+      loadSubscriptions();
+    });
+
+    refreshOrders.addEventListener("click", function () {
+      loadOrders();
+    });
+
+    siteSettingsForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      await saveSiteSettingsAdmin();
+    });
+
+    menuItemForm.addEventListener("change", function (event) {
+      const target = event.target;
+
+      if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) {
+        return;
+      }
+
+      if (target instanceof HTMLSelectElement && target.name === "item_type") {
+        setMenuItemType(target.value);
+        return;
+      }
+
+      if (target.name === "menu_periods") {
+        handleMenuPeriodInputChange(target);
+      }
+    });
+
+    menuItemForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      if (!currentAdminCode) {
+        setStatus(menuFormStatus, "Bitte entsperre den Adminbereich erneut mit dem Code.", "warning");
+        return;
+      }
+
+      if (!backendConfigured()) {
+        setStatus(menuFormStatus, "app-config.js ist noch nicht mit deinem Backend verbunden.", "warning");
+        return;
+      }
+
+      const formData = new FormData(menuItemForm);
+      const itemId = String(formData.get("id") || "").trim();
+      const title = String(formData.get("title") || "").trim();
+      const description = String(formData.get("description") || "").trim();
+
+      if (!title || !description) {
+        setStatus(menuFormStatus, "Titel und Beschreibung sind Pflichtfelder.", "warning");
+        return;
+      }
+
+      const existingItem = itemId ? getMenuItemById(itemId) : null;
+
+      await saveMenuItem({
+        id: itemId,
+        itemType: String(formData.get("item_type") || "food").trim() || "food",
+        title: title,
+        description: description,
+        price: String(formData.get("price") || "").trim(),
+        category: String(formData.get("category") || "").trim(),
+        menuPeriods: readMenuPeriodsFromForm(),
+        badge: String(formData.get("badge") || "").trim(),
+        imageUrl: String(formData.get("image_url") || "").trim(),
+        ctaLabel: String(formData.get("cta_label") || "").trim(),
+        ctaUrl: String(formData.get("cta_url") || "").trim(),
+        isActive: menuItemForm.elements.is_active.checked,
+        sortOrder: existingItem ? existingItem.sortOrder : menuItems.length
+      }, {
+        resetAfterSave: true,
+        successMessage: itemId ? "Eintrag gespeichert." : "Eintrag angelegt."
+      });
+    });
+
+    menuAdminList.addEventListener("click", async function (event) {
+      const button = event.target.closest("button[data-action]");
+
+      if (!button) {
+        return;
+      }
+
+      const action = button.dataset.action;
+      const itemId = button.dataset.id;
+      const item = getMenuItemById(itemId);
+
+      if (!item) {
+        return;
+      }
+
+      if (action === "edit") {
+        fillMenuForm(item, false);
+        return;
+      }
+
+      if (action === "toggle") {
+        await saveMenuItem({
+          id: item.id,
+          itemType: item.itemType,
+          title: item.title,
+          description: item.description,
+          price: item.price,
+          category: item.category,
+          menuPeriods: item.menuPeriods,
+          badge: item.badge,
+          imageUrl: item.imageUrl,
+          ctaLabel: item.ctaLabel,
+          ctaUrl: item.ctaUrl,
+          isActive: !item.isActive,
+          sortOrder: item.sortOrder
+        }, {
+          resetAfterSave: false,
+          successMessage: item.isActive ? "Eintrag ausgeblendet." : "Eintrag eingeblendet."
+        });
+        return;
+      }
+
+      if (action === "delete") {
+        await deleteMenuItem(item.id);
+        return;
+      }
+
+      if (action === "up" || action === "down") {
+        const sortedItems = menuItems.slice().sort(compareMenuItems);
+        const itemIndex = sortedItems.findIndex(function (entry) {
+          return entry.id === item.id;
+        });
+        const swapWith = action === "up" ? itemIndex - 1 : itemIndex + 1;
+
+        if (itemIndex < 0 || swapWith < 0 || swapWith >= sortedItems.length) {
+          return;
+        }
+
+        const nextItems = sortedItems.slice();
+        const currentItem = nextItems[itemIndex];
+        nextItems[itemIndex] = nextItems[swapWith];
+        nextItems[swapWith] = currentItem;
+        await reorderMenuItems(nextItems);
+      }
+    });
+
+    orderAdminList.addEventListener("click", async function (event) {
+      const button = event.target.closest("button[data-action]");
+
+      if (!button || button.dataset.action !== "delete-order") {
+        return;
+      }
+
+      const orderId = button.dataset.id;
+
+      if (!orderId || !getOrderById(orderId)) {
+        return;
+      }
+
+      await deleteOrder(orderId);
+    });
+
+    subscriptionAdminList.addEventListener("click", async function (event) {
+      const button = event.target.closest("button[data-action]");
+
+      if (!button || button.dataset.action !== "delete-subscription") {
+        return;
+      }
+
+      const endpoint = button.dataset.id;
+
+      if (!endpoint || !getSubscriptionByEndpoint(endpoint)) {
+        return;
+      }
+
+      await deleteSubscription(endpoint);
+    });
+
+    renderMenuAdminList();
+    renderSubscriptionAdminList();
+  </script>
+</body>
+</html>

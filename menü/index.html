@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Winkelwerk Menü">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#2b2b2b">
+  <meta name="color-scheme" content="light dark">
+  <title>Winkelwerk Menü</title>
+  <link rel="icon" type="image/png" href="../winkelwerlk.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../app-config.js"></script>
+  <script src="../script.js" defer></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+      --page-bg: #ffffff;
+      --text-color: #1f1f1f;
+      --menu-icon-bg: rgba(0, 0, 0, 0.7);
+      --menu-icon-color: #ffffff;
+      --nav-bg: rgba(0, 0, 0, 0.95);
+      --nav-link-color: #ffffff;
+      --nav-border: rgba(255, 255, 255, 0.1);
+      --nav-muted: rgba(255, 255, 255, 0.68);
+      --toggle-bg: rgba(255, 255, 255, 0.88);
+      --toggle-color: #161616;
+      --toggle-border: rgba(0, 0, 0, 0.08);
+      --btn-bg: #ff4d4d;
+      --btn-bg-hover: #ef3e3e;
+      --card-bg: #ffffff;
+      --card-text: #1f1f1f;
+      --card-shadow: rgba(0, 0, 0, 0.1);
+      --placeholder-color: #7b7b7b;
+      --footer-bg: #111111;
+      --footer-text: #ffffff;
+      --hero-panel-bg: rgba(0, 0, 0, 0.18);
+      --hero-panel-shadow: rgba(0, 0, 0, 0.24);
+      --hero-fade-1: rgba(12, 12, 12, 0.46);
+      --hero-fade-2: rgba(12, 12, 12, 0.42);
+      --hero-fade-3: rgba(12, 12, 12, 0.18);
+      --hero-fade-4: rgba(255, 255, 255, 0.18);
+      --hero-fade-5: rgba(255, 255, 255, 0.72);
+      --hero-fade-6: #ffffff;
+      --hero-glow: rgba(255, 255, 255, 0.08);
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --page-bg: #0f1013;
+      --text-color: #f3f4f6;
+      --menu-icon-bg: rgba(14, 15, 18, 0.82);
+      --menu-icon-color: #ffffff;
+      --nav-bg: rgba(8, 8, 10, 0.95);
+      --nav-link-color: #ffffff;
+      --nav-border: rgba(255, 255, 255, 0.08);
+      --nav-muted: rgba(255, 255, 255, 0.62);
+      --toggle-bg: rgba(15, 16, 19, 0.9);
+      --toggle-color: #f5f5f5;
+      --toggle-border: rgba(255, 255, 255, 0.12);
+      --card-bg: #17191d;
+      --card-text: #f3f4f6;
+      --card-shadow: rgba(0, 0, 0, 0.35);
+      --placeholder-color: #9ca3af;
+      --footer-bg: #090a0c;
+      --footer-text: #ffffff;
+      --hero-panel-bg: rgba(6, 7, 10, 0.34);
+      --hero-panel-shadow: rgba(0, 0, 0, 0.42);
+      --hero-fade-1: rgba(10, 10, 10, 0.58);
+      --hero-fade-2: rgba(10, 10, 10, 0.48);
+      --hero-fade-3: rgba(10, 10, 10, 0.24);
+      --hero-fade-4: rgba(15, 16, 19, 0.16);
+      --hero-fade-5: rgba(15, 16, 19, 0.72);
+      --hero-fade-6: #0f1013;
+      --hero-glow: rgba(255, 255, 255, 0.04);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: var(--page-bg);
+      color: var(--text-color);
+      transition: background-color 0.35s ease, color 0.35s ease;
+    }
+
+    body.site-maintenance-active {
+      overflow: hidden;
+    }
+
+    .menu-icon,
+    .theme-toggle,
+    nav,
+    .card,
+    footer,
+    .hero-content {
+      transition:
+        background-color 0.35s ease,
+        color 0.35s ease,
+        border-color 0.35s ease,
+        box-shadow 0.35s ease,
+        transform 0.2s ease;
+    }
+
+    .menu-icon {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 2000;
+      background: var(--menu-icon-bg);
+      color: var(--menu-icon-color);
+      padding: 6px 12px;
+      border-radius: 8px;
+      backdrop-filter: blur(8px);
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      min-width: 130px;
+      padding: 10px 16px;
+      border: 1px solid var(--toggle-border);
+      border-radius: 999px;
+      background: var(--toggle-bg);
+      color: var(--toggle-color);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      backdrop-filter: blur(12px);
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 250px;
+      height: 100vh;
+      background: var(--nav-bg);
+      display: flex;
+      flex-direction: column;
+      padding-top: 80px;
+      transition: left 0.3s ease, background-color 0.35s ease;
+      z-index: 1500;
+      backdrop-filter: blur(12px);
+    }
+
+    nav.open {
+      left: 0;
+    }
+
+    @media (hover: hover) {
+      .menu-icon:hover ~ nav,
+      nav:hover {
+        left: 0;
+      }
+    }
+
+    nav a {
+      color: var(--nav-link-color);
+      padding: 15px 20px;
+      text-decoration: none;
+      font-weight: bold;
+      border-bottom: 1px solid var(--nav-border);
+    }
+
+    nav a:hover {
+      background: var(--btn-bg);
+    }
+
+    .nav-divider {
+      margin: 22px 20px 16px;
+      border-top: 1px solid var(--nav-border);
+    }
+
+    .notify-toggle {
+      margin: 0 14px;
+      padding: 14px 14px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--nav-link-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      text-align: left;
+      backdrop-filter: blur(10px);
+    }
+
+    .notify-toggle:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .notify-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .notify-title {
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .notify-status {
+      color: var(--nav-muted);
+      font-size: 13px;
+    }
+
+    .notify-switch {
+      position: relative;
+      width: 48px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.2);
+      flex: 0 0 auto;
+    }
+
+    .notify-switch::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: transform 0.25s ease, background-color 0.25s ease;
+    }
+
+    .notify-toggle[data-state="on"] .notify-switch {
+      background: var(--btn-bg);
+    }
+
+    .notify-toggle[data-state="on"] .notify-switch::after {
+      transform: translateX(20px);
+    }
+
+    .notify-toggle[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .notify-hint {
+      margin: 12px 20px 0;
+      color: var(--nav-muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    header {
+      position: relative;
+      min-height: 72vh;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 110px 20px 60px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("https://www.gasthof-winkler.de/images/joomlaplates/festsaal.jpg") center/cover;
+      transform: scale(1.08);
+      filter: blur(2px);
+      z-index: -2;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          to bottom,
+          var(--hero-fade-1) 0%,
+          var(--hero-fade-2) 48%,
+          var(--hero-fade-3) 68%,
+          var(--hero-fade-4) 82%,
+          var(--hero-fade-5) 92%,
+          var(--hero-fade-6) 100%
+        ),
+        radial-gradient(circle at center, var(--hero-glow), transparent 55%);
+      z-index: -1;
+      transition: background 0.35s ease;
+    }
+
+    .hero-content {
+      width: min(92vw, 760px);
+      padding: 36px 28px;
+      border-radius: 28px;
+      background: var(--hero-panel-bg);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 24px 60px var(--hero-panel-shadow);
+    }
+
+    header h1 {
+      font-size: clamp(42px, 6vw, 64px);
+      margin-bottom: 14px;
+      letter-spacing: 0.02em;
+      text-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    header p {
+      font-size: 20px;
+      margin-bottom: 24px;
+      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 999px;
+      background: var(--btn-bg);
+      color: #ffffff;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .btn:hover,
+    .theme-toggle:hover {
+      background: var(--btn-bg-hover);
+      color: #ffffff;
+    }
+
+    section {
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    section h2 {
+      margin-bottom: 20px;
+    }
+
+    .menu-copy,
+    .menu-state {
+      width: min(720px, 100%);
+      margin: 0 auto 24px;
+      line-height: 1.6;
+      color: var(--placeholder-color);
+    }
+
+    .menu-state {
+      margin-top: 24px;
+      margin-bottom: 0;
+    }
+
+    .menu-state.is-hidden {
+      display: none;
+    }
+
+    .menu {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      color: var(--card-text);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px var(--card-shadow);
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .menu-card {
+      text-align: left;
+    }
+
+    .menu-card-body {
+      display: grid;
+      gap: 12px;
+    }
+
+    .menu-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .menu-card-title {
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .menu-card-price {
+      color: var(--btn-bg);
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .menu-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .menu-card-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 77, 77, 0.1);
+      color: var(--card-text);
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .menu-card-description {
+      line-height: 1.65;
+      color: var(--placeholder-color);
+    }
+
+    .menu-card-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-height: 44px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: var(--btn-bg);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .menu-card-link:hover {
+      background: var(--btn-bg-hover);
+      color: #ffffff;
+    }
+
+    .maintenance-screen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top, rgba(255, 77, 77, 0.16), transparent 30%),
+        rgba(12, 13, 16, 0.92);
+      z-index: 4000;
+    }
+
+    body.site-maintenance-active .maintenance-screen {
+      display: flex;
+    }
+
+    .maintenance-card {
+      width: min(100%, 620px);
+      padding: 36px 30px;
+      border-radius: 28px;
+      background: rgba(18, 20, 24, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.32);
+      color: #ffffff;
+      text-align: center;
+      backdrop-filter: blur(16px);
+    }
+
+    .maintenance-card img {
+      width: min(220px, 60%);
+      display: block;
+      margin: 0 auto 22px;
+      border-radius: 18px;
+    }
+
+    .maintenance-kicker {
+      margin-bottom: 10px;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .maintenance-card h2 {
+      margin-bottom: 12px;
+      font-size: clamp(28px, 5vw, 42px);
+    }
+
+    .maintenance-card p {
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.84);
+    }
+
+    footer {
+      background: var(--footer-bg);
+      color: var(--footer-text);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-admin-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--footer-text);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+    }
+
+    .footer-admin-link:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.28);
+      transform: translateY(-1px);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .theme-toggle {
+        display: inline-flex;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .menu {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        min-height: 62vh;
+      }
+
+      header p {
+        font-size: 18px;
+      }
+
+      .hero-content {
+        width: min(95vw, 560px);
+        padding: 28px 18px;
+        border-radius: 22px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+<div class="maintenance-screen" id="maintenanceScreen" aria-live="polite">
+  <div class="maintenance-card">
+    <img src="../winkelwerlk.png" alt="Winkelwerk">
+    <p class="maintenance-kicker">Bitte etwas Geduld</p>
+    <h2>Website wird gerade bearbeitet</h2>
+    <p id="maintenanceMessage">Bitte später erneut versuchen.</p>
+  </div>
+</div>
+
+<div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Zum Dunkelmodus wechseln">Dunkelmodus</button>
+
+<nav id="sideMenu">
+  <a href="../" onclick="toggleMenu()">Startseite</a>
+  <a href="./" onclick="toggleMenu()">Men&uuml;</a>
+  <a href="../getr%C3%A4nke/" onclick="toggleMenu()">Getr&auml;nke</a>
+  <a href="../bestellen/" onclick="toggleMenu()">Bestellen</a>
+  <a href="../poster-sticker/" onclick="toggleMenu()">Poster</a>
+  <a href="../sticker/" onclick="toggleMenu()">Sticker</a>
+  <a href="../#about" onclick="toggleMenu()">&Uuml;ber uns</a>
+  <a href="../#contact" onclick="toggleMenu()">Kontakt</a>
+  <a href="../#location" onclick="toggleMenu()">Standort</a>
+  <a href="../inbox/" onclick="toggleMenu()">Postfach</a>
+  <div class="nav-divider"></div>
+  <button class="notify-toggle" id="notifyToggle" type="button" data-state="off" aria-pressed="false">
+    <span class="notify-copy">
+      <span class="notify-title">Push-Hinweise</span>
+      <span class="notify-status" id="notifyStatus">Aus</span>
+    </span>
+    <span class="notify-switch" aria-hidden="true"></span>
+  </button>
+  <p class="notify-hint" id="notifyHint">Aktiviert Browser-Benachrichtigungen f&uuml;r Winkelwerk.</p>
+</nav>
+
+<header>
+  <div class="hero-content">
+    <h1>Unser Men&uuml;</h1>
+    <p>Alle Gerichte zentral aus dem Adminbereich gepflegt, auf einer eigenen Seite für den klaren Fokus aufs Essen.</p>
+    <div class="hero-actions">
+      <a class="btn" href="../bestellen/">Jetzt bestellen</a>
+      <a class="ghost-btn" href="../getr%C3%A4nke/">Getr&auml;nke ansehen</a>
+      <a class="ghost-btn" href="../#contact">Reservieren</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <h2>Winkelwerk Men&uuml;</h2>
+  <p class="menu-copy">Saisonal, frisch und direkt aus dem Winkelwerk. Dieses Men&uuml; wird vollständig über dein Admin-Panel verwaltet.</p>
+  <div class="menu" id="menuGrid"></div>
+  <p class="menu-state is-hidden" id="menuState"></p>
+</section>
+
+<footer>
+  <div class="footer-row">
+    <p>&copy; 2026 Winkelwerk</p>
+    <a class="footer-admin-link" href="../admin/">Admin</a>
+  </div>
+</footer>
+
+<script>
+  const root = document.documentElement;
+  const appConfig = window.WINKELWERK_APP_CONFIG || {};
+  const themeToggle = document.getElementById("themeToggle");
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  const storageKey = "winkelwerk-desktop-theme";
+  const notificationKey = "winkelwerk-notifications-enabled";
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const notifyToggle = document.getElementById("notifyToggle");
+  const notifyStatus = document.getElementById("notifyStatus");
+  const notifyHint = document.getElementById("notifyHint");
+  const menuGrid = document.getElementById("menuGrid");
+  const menuState = document.getElementById("menuState");
+  const maintenanceScreen = document.getElementById("maintenanceScreen");
+  const maintenanceMessage = document.getElementById("maintenanceMessage");
+  const inboxUrl = new URL("../inbox/", window.location.href).href;
+  const defaultSiteSettings = {
+    maintenanceMode: false,
+    maintenanceMessage: "Website wird gerade bearbeitet. Bitte später erneut versuchen."
+  };
+  const defaultMenuItems = [
+    {
+      title: "Smashburger",
+      description: "Frisch gesmashtes Rindfleisch-Patty vom Holzkohlegrill im Sesam-Bun.",
+      imageUrl: "https://oldworldgardenfarms.com/wp-content/uploads/2025/05/smashburger-735x735.jpg",
+      category: "Burger",
+      badge: "Beliebt",
+      price: "",
+      menuPeriods: ["all_day"],
+      ctaLabel: "",
+      ctaUrl: ""
+    },
+    {
+      title: "Tandoori Chicken",
+      description: "Chicken mariniert in Joghurt und Gewürzen, gegrillt im Tandoor.",
+      imageUrl: "https://images.getrecipekit.com/20250721213330-Tandoori-Chicken-2.jpg?aspect_ratio=16:9&quality=90&",
+      category: "Signature",
+      badge: "",
+      price: "",
+      menuPeriods: ["all_day"],
+      ctaLabel: "",
+      ctaUrl: ""
+    }
+  ];
+  const menuPeriods = {
+    breakfast: {
+      startMinutes: 9 * 60,
+      endMinutes: 12 * 60
+    },
+    lunch: {
+      startMinutes: 12 * 60,
+      endMinutes: 17 * 60
+    },
+    dinner: {
+      startMinutes: 17 * 60,
+      endMinutes: 21 * 60
+    }
+  };
+  const scheduledMenuPeriods = ["breakfast", "lunch", "dinner"];
+  let serviceWorkerRegistrationPromise;
+
+  function isDesktopDevice() {
+    return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  }
+
+  function getSystemTheme() {
+    return prefersDark.matches ? "dark" : "light";
+  }
+
+  function applyTheme(theme) {
+    const nextModeLabel = theme === "dark" ? "Hellmodus" : "Dunkelmodus";
+
+    root.setAttribute("data-theme", theme);
+
+    if (themeMeta) {
+      themeMeta.setAttribute("content", theme === "dark" ? "#0f1013" : "#ffffff");
+    }
+
+    if (themeToggle) {
+      themeToggle.textContent = nextModeLabel;
+      themeToggle.setAttribute("aria-label", "Zum " + nextModeLabel + " wechseln");
+    }
+  }
+
+  function syncThemeWithDevice() {
+    if (isDesktopDevice()) {
+      const savedTheme = localStorage.getItem(storageKey);
+      applyTheme(savedTheme || getSystemTheme());
+      return;
+    }
+
+    applyTheme(getSystemTheme());
+  }
+
+  function toggleMenu() {
+    const sideMenu = document.getElementById("sideMenu");
+
+    if (!sideMenu) {
+      return;
+    }
+
+    sideMenu.classList.toggle("open");
+  }
+
+  function notificationsSupported() {
+    return window.isSecureContext
+      && typeof Notification !== "undefined"
+      && "serviceWorker" in navigator
+      && "PushManager" in window;
+  }
+
+  function getPushApiBaseUrl() {
+    return String(appConfig.pushFunctionUrl || appConfig.pushApiBaseUrl || "").replace(/\/+$/, "");
+  }
+
+  function pushConfigReady() {
+    return Boolean(getPushApiBaseUrl() && appConfig.vapidPublicKey);
+  }
+
+  function notificationsEnabled() {
+    return localStorage.getItem(notificationKey) === "on";
+  }
+
+  function normalizeApiBaseUrl() {
+    return getPushApiBaseUrl();
+  }
+
+  function menuApiConfigured() {
+    return Boolean(normalizeApiBaseUrl());
+  }
+
+  function normalizeSiteSettings(settings) {
+    return {
+      maintenanceMode: Boolean(settings && settings.maintenanceMode),
+      maintenanceMessage: String(
+        settings && settings.maintenanceMessage
+          ? settings.maintenanceMessage
+          : defaultSiteSettings.maintenanceMessage
+      ).trim() || defaultSiteSettings.maintenanceMessage
+    };
+  }
+
+  function applySiteSettings(settings) {
+    const normalized = normalizeSiteSettings(settings);
+
+    if (maintenanceMessage) {
+      maintenanceMessage.textContent = normalized.maintenanceMessage;
+    }
+
+    document.body.classList.toggle("site-maintenance-active", normalized.maintenanceMode);
+
+    if (maintenanceScreen) {
+      maintenanceScreen.setAttribute("aria-hidden", normalized.maintenanceMode ? "false" : "true");
+    }
+  }
+
+  function normalizeMenuItem(item) {
+    const normalizedPeriods = normalizeMenuPeriods(item && (item.menuPeriods || item.menuPeriod));
+
+    return {
+      title: String(item && item.title ? item.title : "").trim(),
+      description: String(item && item.description ? item.description : "").trim(),
+      imageUrl: String(item && item.imageUrl ? item.imageUrl : "").trim(),
+      category: String(item && item.category ? item.category : "").trim(),
+      badge: String(item && item.badge ? item.badge : "").trim(),
+      price: String(item && item.price ? item.price : "").trim(),
+      menuPeriod: normalizedPeriods[0] || "all_day",
+      menuPeriods: normalizedPeriods,
+      ctaLabel: String(item && item.ctaLabel ? item.ctaLabel : "").trim(),
+      ctaUrl: String(item && item.ctaUrl ? item.ctaUrl : "").trim()
+    };
+  }
+
+  function normalizeMenuPeriods(value) {
+    const rawValues = Array.isArray(value)
+      ? value
+      : typeof value === "string"
+        ? String(value).replace(/^\{|\}$/g, "").split(",")
+        : [value];
+
+    const uniqueValues = Array.from(new Set(
+      rawValues
+        .map(function (item) {
+          return String(item || "").trim().toLowerCase();
+        })
+        .filter(function (item) {
+          return ["all_day", "breakfast", "lunch", "dinner"].includes(item);
+        })
+    ));
+
+    if (!uniqueValues.length || uniqueValues.includes("all_day")) {
+      return ["all_day"];
+    }
+
+    return ["breakfast", "lunch", "dinner"].filter(function (item) {
+      return uniqueValues.includes(item);
+    });
+  }
+
+  function getBerlinMinutesOfDay() {
+    const formatter = new Intl.DateTimeFormat("de-DE", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Europe/Berlin"
+    });
+    const parts = formatter.formatToParts(new Date());
+    const hour = Number(parts.find(function (part) {
+      return part.type === "hour";
+    })?.value || 0);
+    const minute = Number(parts.find(function (part) {
+      return part.type === "minute";
+    })?.value || 0);
+    return (hour * 60) + minute;
+  }
+
+  function getActiveScheduledMenuPeriod() {
+    const currentMinutes = getBerlinMinutesOfDay();
+
+    return scheduledMenuPeriods.find(function (key) {
+      const period = menuPeriods[key];
+      return currentMinutes >= period.startMinutes && currentMinutes < period.endMinutes;
+    }) || null;
+  }
+
+  function filterMenuItemsByCurrentTime(items) {
+    const activePeriodKey = getActiveScheduledMenuPeriod();
+    return items.filter(function (item) {
+      const periods = normalizeMenuPeriods(item.menuPeriods || item.menuPeriod);
+      return periods.includes("all_day") || (Boolean(activePeriodKey) && periods.includes(activePeriodKey));
+    });
+  }
+
+  function resolvePublicUrl(value) {
+    const raw = String(value || "").trim();
+
+    if (!raw) {
+      return "";
+    }
+
+    try {
+      const url = new URL(raw, window.location.href);
+
+      if (url.protocol === "http:" || url.protocol === "https:") {
+        return url.href;
+      }
+    } catch (error) {
+      return "";
+    }
+
+    return "";
+  }
+
+  function setMenuState(message, hidden) {
+    menuState.textContent = message;
+    menuState.classList.toggle("is-hidden", Boolean(hidden));
+  }
+
+  function createMenuTag(label) {
+    const tag = document.createElement("span");
+    tag.className = "menu-card-tag";
+    tag.textContent = label;
+    return tag;
+  }
+
+  function createMenuCard(item) {
+    const article = document.createElement("article");
+    article.className = "card menu-card";
+
+    const imageUrl = resolvePublicUrl(item.imageUrl);
+
+    if (imageUrl) {
+      const image = document.createElement("img");
+      image.src = imageUrl;
+      image.alt = item.title || "Menü-Eintrag";
+      article.appendChild(image);
+    }
+
+    const body = document.createElement("div");
+    body.className = "menu-card-body";
+
+    const header = document.createElement("div");
+    header.className = "menu-card-header";
+
+    const title = document.createElement("h3");
+    title.className = "menu-card-title";
+    title.textContent = item.title || "Ohne Titel";
+    header.appendChild(title);
+
+    if (item.price) {
+      const price = document.createElement("span");
+      price.className = "menu-card-price";
+      price.textContent = item.price;
+      header.appendChild(price);
+    }
+
+    body.appendChild(header);
+
+    if (item.category || item.badge) {
+      const tags = document.createElement("div");
+      tags.className = "menu-card-tags";
+
+      if (item.category) {
+        tags.appendChild(createMenuTag(item.category));
+      }
+
+      if (item.badge) {
+        tags.appendChild(createMenuTag(item.badge));
+      }
+
+      body.appendChild(tags);
+    }
+
+    const description = document.createElement("p");
+    description.className = "menu-card-description";
+    description.textContent = item.description;
+    body.appendChild(description);
+
+    const ctaUrl = resolvePublicUrl(item.ctaUrl);
+
+    if (item.ctaLabel && ctaUrl) {
+      const link = document.createElement("a");
+      link.className = "menu-card-link";
+      link.href = ctaUrl;
+      link.textContent = item.ctaLabel;
+      body.appendChild(link);
+    }
+
+    article.appendChild(body);
+    return article;
+  }
+
+  function renderMenuItems(items, emptyMessage) {
+    const normalizedItems = (Array.isArray(items) ? items : [])
+      .map(normalizeMenuItem)
+      .filter(function (item) {
+        return item.title && item.description;
+      });
+
+    const timedMenuItems = filterMenuItemsByCurrentTime(normalizedItems);
+    menuGrid.replaceChildren();
+
+    if (!timedMenuItems.length) {
+      setMenuState(emptyMessage || "Unser Menü wird gerade aktualisiert.", false);
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    timedMenuItems.forEach(function (item) {
+      fragment.appendChild(createMenuCard(item));
+    });
+
+    menuGrid.appendChild(fragment);
+    setMenuState("", true);
+  }
+
+  async function loadMenuItems() {
+    if (!menuApiConfigured()) {
+      renderMenuItems(defaultMenuItems, "");
+      return;
+    }
+
+    setMenuState("Menü wird geladen ...", false);
+
+    try {
+      const response = await fetch(normalizeApiBaseUrl() + "/menu", {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Menu request failed");
+      }
+
+      const result = await response.json();
+      const items = Array.isArray(result && result.items) ? result.items : [];
+
+      if (!items.length) {
+        renderMenuItems([], "Unser Menü wird gerade aktualisiert.");
+        return;
+      }
+
+      renderMenuItems(items, "");
+    } catch (error) {
+      console.log(error);
+      renderMenuItems(defaultMenuItems, "");
+    }
+  }
+
+  async function loadSiteSettings() {
+    if (!menuApiConfigured()) {
+      applySiteSettings(defaultSiteSettings);
+      return defaultSiteSettings;
+    }
+
+    try {
+      const response = await fetch(normalizeApiBaseUrl() + "/site-settings", {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Site settings request failed");
+      }
+
+      const result = await response.json();
+      const settings = normalizeSiteSettings(result && result.settings ? result.settings : defaultSiteSettings);
+      applySiteSettings(settings);
+      return settings;
+    } catch (error) {
+      console.log(error);
+      applySiteSettings(defaultSiteSettings);
+      return defaultSiteSettings;
+    }
+  }
+
+  function vapidKeyToUint8Array(base64String) {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const safeBase64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const raw = window.atob(safeBase64);
+    const output = new Uint8Array(raw.length);
+
+    for (let index = 0; index < raw.length; index += 1) {
+      output[index] = raw.charCodeAt(index);
+    }
+
+    return output;
+  }
+
+  async function getServiceWorkerRegistration() {
+    if (!notificationsSupported()) {
+      return null;
+    }
+
+    if (!serviceWorkerRegistrationPromise) {
+      serviceWorkerRegistrationPromise = navigator.serviceWorker.register("../service-worker.js", {
+        scope: "../"
+      });
+    }
+
+    return serviceWorkerRegistrationPromise;
+  }
+
+  async function postPushJson(path, payload) {
+    const response = await fetch(normalizeApiBaseUrl() + path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Push request failed");
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    return contentType.includes("application/json") ? response.json() : null;
+  }
+
+  async function getCurrentPushSubscription() {
+    if (!notificationsSupported()) {
+      return null;
+    }
+
+    const registration = await getServiceWorkerRegistration();
+    return registration ? registration.pushManager.getSubscription() : null;
+  }
+
+  async function saveInboxMessage(payload) {
+    if (!("serviceWorker" in navigator)) {
+      return;
+    }
+
+    const registration = await getServiceWorkerRegistration();
+
+    if (registration && registration.active) {
+      registration.active.postMessage({
+        type: "SAVE_INBOX_MESSAGE",
+        payload
+      });
+    }
+  }
+
+  function setNotificationUi(mode, statusText, hintHtml) {
+    notifyToggle.dataset.state = mode === "on" ? "on" : "off";
+    notifyToggle.setAttribute("aria-pressed", mode === "on" ? "true" : "false");
+    notifyStatus.textContent = statusText;
+    notifyHint.innerHTML = hintHtml;
+  }
+
+  async function updateNotificationUi() {
+    if (!notificationsSupported()) {
+      notifyToggle.disabled = true;
+      setNotificationUi(
+        "off",
+        "Nicht verfügbar",
+        "Push braucht HTTPS, Service Worker und einen unterstützten Browser."
+      );
+      return;
+    }
+
+    if (!pushConfigReady()) {
+      notifyToggle.disabled = true;
+      setNotificationUi(
+        "off",
+        "Setup fehlt",
+        "Trage zuerst die Backend-URL und den VAPID-Key in <code>../app-config.js</code> ein."
+      );
+      return;
+    }
+
+    const subscription = await getCurrentPushSubscription();
+    const enabled = Boolean(subscription) && Notification.permission === "granted";
+    localStorage.setItem(notificationKey, enabled ? "on" : "off");
+    notifyToggle.disabled = false;
+
+    if (enabled) {
+      setNotificationUi(
+        "on",
+        "An",
+        "Interne Hinweise sind aktiv. Neue Nachrichten landen auch im <a href=\"../inbox/\">Postfach</a>."
+      );
+      return;
+    }
+
+    if (Notification.permission === "denied") {
+      setNotificationUi(
+        "off",
+        "Blockiert",
+        "Der Browser blockiert Push. Erlaube Benachrichtigungen in den Browser-Einstellungen."
+      );
+      return;
+    }
+
+    setNotificationUi(
+      "off",
+      "Aus",
+      "Aktiviert Web-Push für interne Winkelwerk-Nachrichten auf diesem Gerät."
+    );
+  }
+
+  async function enableNotifications() {
+    if (!notificationsSupported() || !pushConfigReady()) {
+      await updateNotificationUi();
+      return;
+    }
+
+    let permission = Notification.permission;
+
+    if (permission !== "granted") {
+      permission = await Notification.requestPermission();
+    }
+
+    if (permission !== "granted") {
+      localStorage.setItem(notificationKey, "off");
+      await updateNotificationUi();
+      return;
+    }
+
+    try {
+      const registration = await getServiceWorkerRegistration();
+      let subscription = await registration.pushManager.getSubscription();
+
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: vapidKeyToUint8Array(String(appConfig.vapidPublicKey))
+        });
+      }
+
+      await postPushJson("/subscribe", {
+        subscription: subscription.toJSON(),
+        site: window.location.origin,
+        page: window.location.pathname,
+        userAgent: navigator.userAgent
+      });
+
+      localStorage.setItem(notificationKey, "on");
+      await saveInboxMessage({
+        id: "local-" + Date.now(),
+        title: "Winkelwerk",
+        body: "Push ist jetzt auf diesem Gerät aktiviert.",
+        url: inboxUrl,
+        sentAt: new Date().toISOString(),
+        source: "system"
+      });
+
+      await registration.showNotification("Winkelwerk", {
+        body: "Push ist jetzt auf diesem Gerät aktiviert.",
+        icon: "../apple-touch-icon.png",
+        badge: "../icon-192.png",
+        data: {
+          url: inboxUrl
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      localStorage.setItem(notificationKey, "off");
+      setNotificationUi(
+        "off",
+        "Fehler",
+        "Die Push-Anmeldung hat nicht funktioniert. Prüfe Backend, VAPID-Key und HTTPS."
+      );
+      return;
+    }
+
+    await updateNotificationUi();
+  }
+
+  async function disableNotifications() {
+    try {
+      const subscription = await getCurrentPushSubscription();
+
+      if (subscription) {
+        await postPushJson("/unsubscribe", {
+          endpoint: subscription.endpoint
+        });
+
+        await subscription.unsubscribe();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    localStorage.setItem(notificationKey, "off");
+    await updateNotificationUi();
+  }
+
+  themeToggle.addEventListener("click", function () {
+    const nextTheme = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    localStorage.setItem(storageKey, nextTheme);
+    applyTheme(nextTheme);
+  });
+
+  notifyToggle.addEventListener("click", async function () {
+    if (notificationsEnabled()) {
+      await disableNotifications();
+      return;
+    }
+
+    await enableNotifications();
+  });
+
+  function handleSystemThemeChange() {
+    if (!isDesktopDevice() || !localStorage.getItem(storageKey)) {
+      applyTheme(getSystemTheme());
+    }
+  }
+
+  if (typeof prefersDark.addEventListener === "function") {
+    prefersDark.addEventListener("change", handleSystemThemeChange);
+  } else if (typeof prefersDark.addListener === "function") {
+    prefersDark.addListener(handleSystemThemeChange);
+  }
+
+  window.addEventListener("resize", syncThemeWithDevice);
+  window.addEventListener("focus", function () {
+    updateNotificationUi();
+  });
+  syncThemeWithDevice();
+  updateNotificationUi();
+  loadSiteSettings();
+  loadMenuItems();
+</script>
+
+</body>
+</html>

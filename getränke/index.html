@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Winkelwerk Getränke">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#2b2b2b">
+  <meta name="color-scheme" content="light dark">
+  <title>Winkelwerk Getränke</title>
+  <link rel="icon" type="image/png" href="../winkelwerlk.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../app-config.js"></script>
+  <script src="../script.js" defer></script>
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+<div class="maintenance-screen" id="maintenanceScreen" aria-live="polite">
+  <div class="maintenance-card">
+    <img src="../winkelwerlk.png" alt="Winkelwerk">
+    <p class="maintenance-kicker">Bitte etwas Geduld</p>
+    <h2>Website wird gerade bearbeitet</h2>
+    <p id="maintenanceMessage">Bitte später erneut versuchen.</p>
+  </div>
+</div>
+
+<div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Zum Dunkelmodus wechseln">Dunkelmodus</button>
+
+<nav id="sideMenu">
+  <a href="../" onclick="toggleMenu()">Startseite</a>
+  <a href="../men%C3%BC/" onclick="toggleMenu()">Men&uuml;</a>
+  <a href="./" onclick="toggleMenu()">Getr&auml;nke</a>
+  <a href="../bestellen/" onclick="toggleMenu()">Bestellen</a>
+  <a href="../poster-sticker/" onclick="toggleMenu()">Poster</a>
+  <a href="../sticker/" onclick="toggleMenu()">Sticker</a>
+  <a href="../#about" onclick="toggleMenu()">&Uuml;ber uns</a>
+  <a href="../#contact" onclick="toggleMenu()">Kontakt</a>
+  <a href="../#location" onclick="toggleMenu()">Standort</a>
+  <a href="../inbox/" onclick="toggleMenu()">Postfach</a>
+  <div class="nav-divider"></div>
+  <button class="notify-toggle" id="notifyToggle" type="button" data-state="off" aria-pressed="false">
+    <span class="notify-copy">
+      <span class="notify-title">Push-Hinweise</span>
+      <span class="notify-status" id="notifyStatus">Aus</span>
+    </span>
+    <span class="notify-switch" aria-hidden="true"></span>
+  </button>
+  <p class="notify-hint" id="notifyHint">Aktiviert Browser-Benachrichtigungen f&uuml;r Winkelwerk.</p>
+</nav>
+
+<header>
+  <div class="hero-content">
+    <p class="page-eyebrow">Getr&auml;nke</p>
+    <h1>Winkelwerk Getränke</h1>
+    <p>Heiß, kalt und frisch gemischt. Die Getränkekarte wird direkt aus dem Backend geladen und passt perfekt zum Menü.</p>
+    <div class="hero-actions">
+      <a class="btn" href="../bestellen/">Jetzt bestellen</a>
+      <a class="ghost-btn" href="../men%C3%BC/">Zum Men&uuml;</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <h2>Unsere Getränkekarte</h2>
+  <p class="menu-copy">Diese Seite zeigt nur die aktiven Getränke aus dem Adminbereich. So bleibt die Karte schlank und klar.</p>
+  <div class="menu" id="drinkGrid"></div>
+  <p class="menu-state is-hidden" id="drinkState"></p>
+</section>
+
+<footer>
+  <div class="footer-row">
+    <p>&copy; 2026 Winkelwerk</p>
+    <a class="footer-admin-link" href="../admin/">Admin</a>
+  </div>
+</footer>
+
+<script>
+  const root = document.documentElement;
+  const appConfig = window.WINKELWERK_APP_CONFIG || {};
+  const themeToggle = document.getElementById("themeToggle");
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  const storageKey = "winkelwerk-desktop-theme";
+  const notificationKey = "winkelwerk-notifications-enabled";
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const notifyToggle = document.getElementById("notifyToggle");
+  const notifyStatus = document.getElementById("notifyStatus");
+  const notifyHint = document.getElementById("notifyHint");
+  const menuGrid = document.getElementById("drinkGrid");
+  const menuState = document.getElementById("drinkState");
+  const maintenanceScreen = document.getElementById("maintenanceScreen");
+  const maintenanceMessage = document.getElementById("maintenanceMessage");
+  const inboxUrl = new URL("../inbox/", window.location.href).href;
+  const defaultSiteSettings = {
+    maintenanceMode: false,
+    maintenanceMessage: "Website wird gerade bearbeitet. Bitte später erneut versuchen."
+  };
+  const defaultDrinkItems = [
+    {
+      title: "Hauslimonade",
+      description: "Spritzig, frisch und mit feiner Zitrusnote.",
+      imageUrl: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?auto=format&fit=crop&w=1200&q=80",
+      category: "Kalt",
+      badge: "Hausgemacht",
+      price: "4,90 EUR",
+      priceValue: 4.9,
+      itemType: "drink",
+      menuPeriods: ["all_day"],
+      ctaLabel: "",
+      ctaUrl: ""
+    },
+    {
+      title: "Espresso",
+      description: "Klein, stark und perfekt nach dem Essen.",
+      imageUrl: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=1200&q=80",
+      category: "Heiß",
+      badge: "Klassiker",
+      price: "2,80 EUR",
+      priceValue: 2.8,
+      itemType: "drink",
+      menuPeriods: ["all_day"],
+      ctaLabel: "",
+      ctaUrl: ""
+    },
+    {
+      title: "Cappuccino",
+      description: "Cremiger Espresso mit fein aufgeschäumter Milch.",
+      imageUrl: "https://images.unsplash.com/photo-1517701550927-30cf4ba1fe5f?auto=format&fit=crop&w=1200&q=80",
+      category: "Heiß",
+      badge: "Beliebt",
+      price: "3,90 EUR",
+      priceValue: 3.9,
+      itemType: "drink",
+      menuPeriods: ["all_day"],
+      ctaLabel: "",
+      ctaUrl: ""
+    }
+  ];
+  let serviceWorkerRegistrationPromise;
+
+  function isDesktopDevice() {
+    return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  }
+
+  function getSystemTheme() {
+    return prefersDark.matches ? "dark" : "light";
+  }
+
+  function applyTheme(theme) {
+    const nextModeLabel = theme === "dark" ? "Hellmodus" : "Dunkelmodus";
+
+    root.setAttribute("data-theme", theme);
+
+    if (themeMeta) {
+      themeMeta.setAttribute("content", theme === "dark" ? "#0f1013" : "#ffffff");
+    }
+
+    if (themeToggle) {
+      themeToggle.textContent = nextModeLabel;
+      themeToggle.setAttribute("aria-label", "Zum " + nextModeLabel + " wechseln");
+    }
+  }
+
+  function syncThemeWithDevice() {
+    if (isDesktopDevice()) {
+      const savedTheme = localStorage.getItem(storageKey);
+      applyTheme(savedTheme || getSystemTheme());
+      return;
+    }
+
+    applyTheme(getSystemTheme());
+  }
+
+  function toggleMenu() {
+    const sideMenu = document.getElementById("sideMenu");
+
+    if (!sideMenu) {
+      return;
+    }
+
+    sideMenu.classList.toggle("open");
+  }
+
+  function notificationsSupported() {
+    return window.isSecureContext
+      && typeof Notification !== "undefined"
+      && "serviceWorker" in navigator
+      && "PushManager" in window;
+  }
+
+  function getPushApiBaseUrl() {
+    return String(appConfig.pushFunctionUrl || appConfig.pushApiBaseUrl || "").replace(/\/+$/, "");
+  }
+
+  function pushConfigReady() {
+    return Boolean(getPushApiBaseUrl() && appConfig.vapidPublicKey);
+  }
+
+  function notificationsEnabled() {
+    return localStorage.getItem(notificationKey) === "on";
+  }
+
+  function normalizeApiBaseUrl() {
+    return getPushApiBaseUrl();
+  }
+
+  function menuApiConfigured() {
+    return Boolean(normalizeApiBaseUrl());
+  }
+
+  function normalizeSiteSettings(settings) {
+    return {
+      maintenanceMode: Boolean(settings && settings.maintenanceMode),
+      maintenanceMessage: String(
+        settings && settings.maintenanceMessage
+          ? settings.maintenanceMessage
+          : defaultSiteSettings.maintenanceMessage
+      ).trim() || defaultSiteSettings.maintenanceMessage
+    };
+  }
+
+  function applySiteSettings(settings) {
+    const normalized = normalizeSiteSettings(settings);
+
+    if (maintenanceMessage) {
+      maintenanceMessage.textContent = normalized.maintenanceMessage;
+    }
+
+    document.body.classList.toggle("site-maintenance-active", normalized.maintenanceMode);
+
+    if (maintenanceScreen) {
+      maintenanceScreen.setAttribute("aria-hidden", normalized.maintenanceMode ? "false" : "true");
+    }
+  }
+
+  function normalizeDrinkItem(item) {
+    return {
+      title: String(item && item.title ? item.title : "").trim(),
+      description: String(item && item.description ? item.description : "").trim(),
+      imageUrl: String(item && item.imageUrl ? item.imageUrl : "").trim(),
+      category: String(item && item.category ? item.category : "").trim(),
+      badge: String(item && item.badge ? item.badge : "").trim(),
+      price: String(item && item.price ? item.price : "").trim(),
+      priceValue: Number.isFinite(Number(item && item.priceValue)) ? Number(item.priceValue) : 0,
+      ctaLabel: String(item && item.ctaLabel ? item.ctaLabel : "").trim(),
+      ctaUrl: String(item && item.ctaUrl ? item.ctaUrl : "").trim()
+    };
+  }
+
+  function resolvePublicUrl(value) {
+    const raw = String(value || "").trim();
+
+    if (!raw) {
+      return "";
+    }
+
+    try {
+      const url = new URL(raw, window.location.href);
+
+      if (url.protocol === "http:" || url.protocol === "https:") {
+        return url.href;
+      }
+    } catch (error) {
+      return "";
+    }
+
+    return "";
+  }
+
+  function setMenuState(message, hidden) {
+    if (!menuState) {
+      return;
+    }
+
+    menuState.textContent = message;
+    menuState.classList.toggle("is-hidden", Boolean(hidden));
+  }
+
+  function createMenuTag(label) {
+    const tag = document.createElement("span");
+    tag.className = "menu-card-tag";
+    tag.textContent = label;
+    return tag;
+  }
+
+  function createMenuCard(item) {
+    const article = document.createElement("article");
+    article.className = "card menu-card";
+
+    const imageUrl = resolvePublicUrl(item.imageUrl);
+
+    if (imageUrl) {
+      const image = document.createElement("img");
+      image.src = imageUrl;
+      image.alt = item.title || "Getränk";
+      article.appendChild(image);
+    }
+
+    const body = document.createElement("div");
+    body.className = "menu-card-body";
+
+    const header = document.createElement("div");
+    header.className = "menu-card-header";
+
+    const title = document.createElement("h3");
+    title.className = "menu-card-title";
+    title.textContent = item.title || "Ohne Titel";
+    header.appendChild(title);
+
+    if (item.price) {
+      const price = document.createElement("span");
+      price.className = "menu-card-price";
+      price.textContent = item.price;
+      header.appendChild(price);
+    }
+
+    body.appendChild(header);
+
+    if (item.category || item.badge) {
+      const tags = document.createElement("div");
+      tags.className = "menu-card-tags";
+
+      if (item.category) {
+        tags.appendChild(createMenuTag(item.category));
+      }
+
+      if (item.badge) {
+        tags.appendChild(createMenuTag(item.badge));
+      }
+
+      body.appendChild(tags);
+    }
+
+    const description = document.createElement("p");
+    description.className = "menu-card-description";
+    description.textContent = item.description;
+    body.appendChild(description);
+
+    const ctaUrl = resolvePublicUrl(item.ctaUrl);
+
+    if (item.ctaLabel && ctaUrl) {
+      const link = document.createElement("a");
+      link.className = "menu-card-link";
+      link.href = ctaUrl;
+      link.textContent = item.ctaLabel;
+      body.appendChild(link);
+    }
+
+    article.appendChild(body);
+    return article;
+  }
+
+  function renderMenuItems(items, emptyMessage) {
+    if (!menuGrid) {
+      return;
+    }
+
+    const normalizedItems = (Array.isArray(items) ? items : [])
+      .map(normalizeDrinkItem)
+      .filter(function (item) {
+        return item.title && item.description;
+      });
+
+    menuGrid.replaceChildren();
+
+    if (!normalizedItems.length) {
+      setMenuState("", true);
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    normalizedItems.forEach(function (item) {
+      fragment.appendChild(createMenuCard(item));
+    });
+
+    menuGrid.appendChild(fragment);
+    setMenuState("", true);
+  }
+
+  async function loadSiteSettings() {
+    if (!menuApiConfigured()) {
+      applySiteSettings(defaultSiteSettings);
+      return;
+    }
+
+    try {
+      const response = await fetch(normalizeApiBaseUrl() + "/site-settings", {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        throw new Error("Site settings request failed");
+      }
+
+      const result = await response.json();
+      const settings = result && result.settings ? result.settings : defaultSiteSettings;
+      applySiteSettings(settings);
+    } catch (error) {
+      console.log(error);
+      applySiteSettings(defaultSiteSettings);
+    }
+  }
+
+  async function loadDrinks() {
+    if (!menuApiConfigured()) {
+      renderMenuItems(defaultDrinkItems, "");
+      return;
+    }
+
+    try {
+      const response = await fetch(normalizeApiBaseUrl() + "/drinks", {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Drink request failed");
+      }
+
+      const result = await response.json();
+      const items = Array.isArray(result && result.items) ? result.items : [];
+
+      if (!items.length) {
+        renderMenuItems(defaultDrinkItems, "");
+        return;
+      }
+
+      renderMenuItems(items, "");
+    } catch (error) {
+      console.log(error);
+      renderMenuItems(defaultDrinkItems, "");
+    }
+  }
+
+  function vapidKeyToUint8Array(base64String) {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const safeBase64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const raw = window.atob(safeBase64);
+    const output = new Uint8Array(raw.length);
+
+    for (let index = 0; index < raw.length; index += 1) {
+      output[index] = raw.charCodeAt(index);
+    }
+
+    return output;
+  }
+
+  async function getServiceWorkerRegistration() {
+    if (!notificationsSupported()) {
+      return null;
+    }
+
+    if (!serviceWorkerRegistrationPromise) {
+      serviceWorkerRegistrationPromise = navigator.serviceWorker.register("../service-worker.js", {
+        scope: "../"
+      });
+    }
+
+    return serviceWorkerRegistrationPromise;
+  }
+
+  async function postPushJson(path, payload) {
+    const response = await fetch(normalizeApiBaseUrl() + path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Push request failed");
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    return contentType.includes("application/json") ? response.json() : null;
+  }
+
+  async function getCurrentPushSubscription() {
+    if (!notificationsSupported()) {
+      return null;
+    }
+
+    const registration = await getServiceWorkerRegistration();
+    return registration ? registration.pushManager.getSubscription() : null;
+  }
+
+  async function saveInboxMessage(payload) {
+    if (!("serviceWorker" in navigator)) {
+      return;
+    }
+
+    const registration = await getServiceWorkerRegistration();
+
+    if (registration && registration.active) {
+      registration.active.postMessage({
+        type: "SAVE_INBOX_MESSAGE",
+        payload
+      });
+    }
+  }
+
+  function setNotificationUi(mode, statusText, hintHtml) {
+    notifyToggle.dataset.state = mode === "on" ? "on" : "off";
+    notifyToggle.setAttribute("aria-pressed", mode === "on" ? "true" : "false");
+    notifyStatus.textContent = statusText;
+    notifyHint.innerHTML = hintHtml;
+  }
+
+  async function updateNotificationUi() {
+    if (!notificationsSupported()) {
+      notifyToggle.disabled = true;
+      setNotificationUi(
+        "off",
+        "Nicht verfügbar",
+        "Push braucht HTTPS, Service Worker und einen unterstützten Browser."
+      );
+      return;
+    }
+
+    if (!pushConfigReady()) {
+      notifyToggle.disabled = true;
+      setNotificationUi(
+        "off",
+        "Setup fehlt",
+        "Trage zuerst die Backend-URL und den VAPID-Key in <code>../app-config.js</code> ein."
+      );
+      return;
+    }
+
+    const subscription = await getCurrentPushSubscription();
+    const enabled = Boolean(subscription) && Notification.permission === "granted";
+    localStorage.setItem(notificationKey, enabled ? "on" : "off");
+    notifyToggle.disabled = false;
+
+    if (enabled) {
+      setNotificationUi(
+        "on",
+        "An",
+        "Interne Hinweise sind aktiv. Neue Nachrichten landen auch im <a href=\"../inbox/\">Postfach</a>."
+      );
+      return;
+    }
+
+    if (Notification.permission === "denied") {
+      setNotificationUi(
+        "off",
+        "Blockiert",
+        "Der Browser blockiert Push. Erlaube Benachrichtigungen in den Browser-Einstellungen."
+      );
+      return;
+    }
+
+    setNotificationUi(
+      "off",
+      "Aus",
+      "Aktiviert Web-Push für interne Winkelwerk-Nachrichten auf diesem Gerät."
+    );
+  }
+
+  async function enableNotifications() {
+    if (!notificationsSupported() || !pushConfigReady()) {
+      await updateNotificationUi();
+      return;
+    }
+
+    let permission = Notification.permission;
+
+    if (permission !== "granted") {
+      permission = await Notification.requestPermission();
+    }
+
+    if (permission !== "granted") {
+      localStorage.setItem(notificationKey, "off");
+      await updateNotificationUi();
+      return;
+    }
+
+    try {
+      const registration = await getServiceWorkerRegistration();
+      let subscription = await registration.pushManager.getSubscription();
+
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: vapidKeyToUint8Array(String(appConfig.vapidPublicKey))
+        });
+      }
+
+      await postPushJson("/subscribe", {
+        subscription: subscription.toJSON(),
+        site: window.location.origin,
+        page: window.location.pathname,
+        userAgent: navigator.userAgent
+      });
+
+      localStorage.setItem(notificationKey, "on");
+      await saveInboxMessage({
+        id: "local-" + Date.now(),
+        title: "Winkelwerk",
+        body: "Push ist jetzt auf diesem Gerät aktiviert.",
+        url: inboxUrl,
+        sentAt: new Date().toISOString(),
+        source: "system"
+      });
+
+      await registration.showNotification("Winkelwerk", {
+        body: "Push ist jetzt auf diesem Gerät aktiviert.",
+        icon: "../apple-touch-icon.png",
+        badge: "../icon-192.png",
+        data: {
+          url: inboxUrl
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      localStorage.setItem(notificationKey, "off");
+      setNotificationUi(
+        "off",
+        "Fehler",
+        "Die Push-Anmeldung hat nicht funktioniert. Prüfe Backend, VAPID-Key und HTTPS."
+      );
+      return;
+    }
+
+    await updateNotificationUi();
+  }
+
+  async function disableNotifications() {
+    try {
+      const subscription = await getCurrentPushSubscription();
+
+      if (subscription) {
+        await postPushJson("/unsubscribe", {
+          endpoint: subscription.endpoint
+        });
+
+        await subscription.unsubscribe();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    localStorage.setItem(notificationKey, "off");
+    await updateNotificationUi();
+  }
+
+  themeToggle.addEventListener("click", function () {
+    const nextTheme = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    localStorage.setItem(storageKey, nextTheme);
+    applyTheme(nextTheme);
+  });
+
+  notifyToggle.addEventListener("click", async function () {
+    if (notificationsEnabled()) {
+      await disableNotifications();
+      return;
+    }
+
+    await enableNotifications();
+  });
+
+  function handleSystemThemeChange() {
+    if (!isDesktopDevice() || !localStorage.getItem(storageKey)) {
+      applyTheme(getSystemTheme());
+    }
+  }
+
+  if (typeof prefersDark.addEventListener === "function") {
+    prefersDark.addEventListener("change", handleSystemThemeChange);
+  } else if (typeof prefersDark.addListener === "function") {
+    prefersDark.addListener(handleSystemThemeChange);
+  }
+
+  window.addEventListener("resize", syncThemeWithDevice);
+  window.addEventListener("focus", function () {
+    updateNotificationUi();
+  });
+  syncThemeWithDevice();
+  updateNotificationUi();
+  loadSiteSettings();
+  loadDrinks();
+</script>
+
+</body>
+</html>

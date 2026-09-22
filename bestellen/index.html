@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Winkelwerk Bestellen">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#2b2b2b">
+  <meta name="color-scheme" content="light dark">
+  <title>Winkelwerk Bestellen</title>
+  <link rel="icon" type="image/png" href="../winkelwerlk.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../app-config.js"></script>
+  <script src="../script.js" defer></script>
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+<div class="maintenance-screen" id="maintenanceScreen" aria-live="polite">
+  <div class="maintenance-card">
+    <img src="../winkelwerlk.png" alt="Winkelwerk">
+    <p class="maintenance-kicker">Bitte etwas Geduld</p>
+    <h2>Website wird gerade bearbeitet</h2>
+    <p id="maintenanceMessage">Bitte später erneut versuchen.</p>
+  </div>
+</div>
+
+<div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Zum Dunkelmodus wechseln">Dunkelmodus</button>
+
+<nav id="sideMenu">
+  <a href="../" onclick="toggleMenu()">Startseite</a>
+  <a href="../men%C3%BC/" onclick="toggleMenu()">Men&uuml;</a>
+  <a href="../getr%C3%A4nke/" onclick="toggleMenu()">Getr&auml;nke</a>
+  <a href="./" onclick="toggleMenu()">Bestellen</a>
+  <a href="../poster-sticker/" onclick="toggleMenu()">Poster</a>
+  <a href="../sticker/" onclick="toggleMenu()">Sticker</a>
+  <a href="../#about" onclick="toggleMenu()">&Uuml;ber uns</a>
+  <a href="../#contact" onclick="toggleMenu()">Kontakt</a>
+  <a href="../#location" onclick="toggleMenu()">Standort</a>
+  <a href="../inbox/" onclick="toggleMenu()">Postfach</a>
+  <div class="nav-divider"></div>
+  <button class="notify-toggle" id="notifyToggle" type="button" data-state="off" aria-pressed="false" disabled>
+    <span class="notify-copy">
+      <span class="notify-title">Push-Hinweise</span>
+      <span class="notify-status" id="notifyStatus">Info</span>
+    </span>
+    <span class="notify-switch" aria-hidden="true"></span>
+  </button>
+  <p class="notify-hint" id="notifyHint">Diese Seite dient nur zum Bestellen. Push-Hinweise verwaltest du auf den Info-Seiten oder im Admin.</p>
+</nav>
+
+<header>
+  <div class="hero-content">
+    <p class="page-eyebrow">Bestellmen&uuml;</p>
+    <h1>Winkelwerk bestellen</h1>
+    <p>W&auml;hle Speisen und Getr&auml;nke aus, pr&uuml;fe den Warenkorb rechts und sende die Bestellung direkt ab.</p>
+    <div class="hero-actions">
+      <a class="btn" href="../men%C3%BC/">Zum Men&uuml;</a>
+      <a class="ghost-btn" href="../getr%C3%A4nke/">Getr&auml;nke</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <h2>Speisen &amp; Getr&auml;nke</h2>
+  <p class="menu-copy">Die Karte wird live aus dem Backend geladen. Du kannst mehrere Positionen kombinieren und unten als Demo-Bestellung absenden.</p>
+  <p class="status" id="catalogStatus"></p>
+
+  <div class="catalog-layout">
+    <div class="catalog-panel" id="catalogPanel">
+      <div class="catalog-group">
+        <div class="catalog-group-head">
+          <div>
+            <h3>Speisen</h3>
+            <p>Aktive Gerichte aus der Speisekarte.</p>
+          </div>
+          <span class="tag" id="foodCount">0 Artikel</span>
+        </div>
+        <div class="catalog-grid" id="foodCatalog"></div>
+      </div>
+
+      <div class="catalog-group">
+        <div class="catalog-group-head">
+          <div>
+            <h3>Getr&auml;nke</h3>
+            <p>Aktive Getr&auml;nke aus der Getr&auml;nkekarte.</p>
+          </div>
+          <span class="tag" id="drinkCount">0 Artikel</span>
+        </div>
+        <div class="catalog-grid" id="drinkCatalog"></div>
+      </div>
+    </div>
+
+    <aside class="cart-panel">
+      <div class="cart-card">
+        <div class="cart-head">
+          <div>
+            <p class="admin-kicker">Warenkorb</p>
+            <h3>Deine Auswahl</h3>
+            <p class="lead">Hier siehst du die aktuellen Positionen und die Summe deiner Bestellung.</p>
+          </div>
+          <button class="ghost-btn small-btn" id="clearCartButton" type="button">Leeren</button>
+        </div>
+
+        <div class="cart-list" id="cartList"></div>
+
+        <div class="order-summary">
+          <div class="order-summary-row">
+            <span>Zwischensumme</span>
+            <strong id="orderTotal">0,00 €</strong>
+          </div>
+          <div class="order-summary-row">
+            <span>Artikel</span>
+            <strong id="orderCount">0</strong>
+          </div>
+        </div>
+
+        <form class="order-form" id="orderForm">
+          <h3>Bestellung abschicken</h3>
+
+          <label>
+            Name
+            <input type="text" name="customer_name" placeholder="Dein Name" required>
+          </label>
+
+          <label>
+            Kontakt
+            <input type="text" name="customer_contact" placeholder="Telefon oder E-Mail" required>
+          </label>
+
+          <label>
+            Wunschzeit
+            <input type="text" name="pickup_time" placeholder="z. B. heute 18:30">
+          </label>
+
+          <label>
+            Notiz
+            <textarea name="notes" placeholder="z. B. ohne Zwiebeln, extra Servietten ..."></textarea>
+          </label>
+
+          <button class="btn" type="submit">Demo-Bestellung absenden</button>
+          <p class="status order-status" id="orderStatus"></p>
+        </form>
+      </div>
+
+      <p class="order-disclaimer">Hinweis: Diese Bestellung ist nur eine Demo. Nichts wird wirklich zubereitet oder ausgegeben, und wir unterst&uuml;tzen keine Lebensmittelverschwendung.</p>
+    </aside>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-row">
+    <p>&copy; 2026 Winkelwerk</p>
+    <a class="footer-admin-link" href="../admin/">Admin</a>
+  </div>
+</footer>
+
+<script>
+  const appConfig = window.WINKELWERK_APP_CONFIG || {};
+  const root = document.documentElement;
+  const themeToggle = document.getElementById("themeToggle");
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  const storageKey = "winkelwerk-desktop-theme";
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const orderForm = document.getElementById("orderForm");
+  const clearCartButton = document.getElementById("clearCartButton");
+  const orderStatus = document.getElementById("orderStatus");
+  const catalogStatus = document.getElementById("catalogStatus");
+  const foodCatalog = document.getElementById("foodCatalog");
+  const drinkCatalog = document.getElementById("drinkCatalog");
+  const foodCount = document.getElementById("foodCount");
+  const drinkCount = document.getElementById("drinkCount");
+  const cartList = document.getElementById("cartList");
+  const orderTotal = document.getElementById("orderTotal");
+  const orderCount = document.getElementById("orderCount");
+  const maintenanceScreen = document.getElementById("maintenanceScreen");
+  const maintenanceMessage = document.getElementById("maintenanceMessage");
+
+  const defaultSiteSettings = {
+    maintenanceMode: false,
+    maintenanceMessage: "Website wird gerade bearbeitet. Bitte später erneut versuchen."
+  };
+
+  const defaultFoodItems = [
+    {
+      id: "demo-smashburger",
+      title: "Smashburger",
+      description: "Frisch gesmashtes Rindfleisch-Patty vom Holzkohlegrill im Sesam-Bun.",
+      imageUrl: "https://oldworldgardenfarms.com/wp-content/uploads/2025/05/smashburger-735x735.jpg",
+      category: "Burger",
+      badge: "Beliebt",
+      price: "13,90 €",
+      priceValue: 13.9,
+      itemType: "food",
+      menuPeriods: ["all_day"]
+    },
+    {
+      id: "demo-tandoori",
+      title: "Tandoori Chicken",
+      description: "Chicken mariniert in Joghurt und Gewürzen, gegrillt im Tandoor.",
+      imageUrl: "https://images.getrecipekit.com/20250721213330-Tandoori-Chicken-2.jpg?aspect_ratio=16:9&quality=90&",
+      category: "Signature",
+      badge: "",
+      price: "16,90 €",
+      priceValue: 16.9,
+      itemType: "food",
+      menuPeriods: ["all_day"]
+    }
+  ];
+
+  const defaultDrinkItems = [
+    {
+      id: "demo-hauslimonade",
+      title: "Hauslimonade",
+      description: "Spritzig, frisch und mit feiner Zitrusnote.",
+      imageUrl: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?auto=format&fit=crop&w=1200&q=80",
+      category: "Kalt",
+      badge: "Hausgemacht",
+      price: "4,90 €",
+      priceValue: 4.9,
+      itemType: "drink",
+      menuPeriods: ["all_day"]
+    },
+    {
+      id: "demo-espresso",
+      title: "Espresso",
+      description: "Klein, stark und perfekt nach dem Essen.",
+      imageUrl: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=1200&q=80",
+      category: "Heiß",
+      badge: "Klassiker",
+      price: "2,80 €",
+      priceValue: 2.8,
+      itemType: "drink",
+      menuPeriods: ["all_day"]
+    },
+    {
+      id: "demo-cappuccino",
+      title: "Cappuccino",
+      description: "Cremiger Espresso mit fein aufgeschäumter Milch.",
+      imageUrl: "https://images.unsplash.com/photo-1517701550927-30cf4ba1fe5f?auto=format&fit=crop&w=1200&q=80",
+      category: "Heiß",
+      badge: "Beliebt",
+      price: "3,90 €",
+      priceValue: 3.9,
+      itemType: "drink",
+      menuPeriods: ["all_day"]
+    }
+  ];
+
+  const menuPeriods = {
+    breakfast: { startMinutes: 9 * 60, endMinutes: 12 * 60 },
+    lunch: { startMinutes: 12 * 60, endMinutes: 17 * 60 },
+    dinner: { startMinutes: 17 * 60, endMinutes: 21 * 60 }
+  };
+
+  const scheduledMenuPeriods = ["breakfast", "lunch", "dinner"];
+  let foodItems = [];
+  let drinkItems = [];
+  let cart = new Map();
+  let serviceWorkerRegistrationPromise;
+
+  function toggleMenu() {
+    const sideMenu = document.getElementById("sideMenu");
+
+    if (!sideMenu) {
+      return;
+    }
+
+    sideMenu.classList.toggle("open");
+  }
+
+  function isDesktopDevice() {
+    return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  }
+
+  function getSystemTheme() {
+    return prefersDark.matches ? "dark" : "light";
+  }
+
+  function applyTheme(theme) {
+    const nextModeLabel = theme === "dark" ? "Hellmodus" : "Dunkelmodus";
+
+    root.setAttribute("data-theme", theme);
+
+    if (themeMeta) {
+      themeMeta.setAttribute("content", theme === "dark" ? "#0f1013" : "#ffffff");
+    }
+
+    if (themeToggle) {
+      themeToggle.textContent = nextModeLabel;
+      themeToggle.setAttribute("aria-label", "Zum " + nextModeLabel + " wechseln");
+    }
+  }
+
+  function syncThemeWithDevice() {
+    if (isDesktopDevice()) {
+      const savedTheme = localStorage.getItem(storageKey);
+      applyTheme(savedTheme || getSystemTheme());
+      return;
+    }
+
+    applyTheme(getSystemTheme());
+  }
+
+  function getPushApiBaseUrl() {
+    return String(appConfig.pushFunctionUrl || appConfig.pushApiBaseUrl || "").replace(/\/+$/, "");
+  }
+
+  function normalizeApiBaseUrl() {
+    return getPushApiBaseUrl();
+  }
+
+  function menuApiConfigured() {
+    return Boolean(normalizeApiBaseUrl());
+  }
+
+  function normalizeSiteSettings(settings) {
+    return {
+      maintenanceMode: Boolean(settings && settings.maintenanceMode),
+      maintenanceMessage: String(
+        settings && settings.maintenanceMessage
+          ? settings.maintenanceMessage
+          : defaultSiteSettings.maintenanceMessage
+      ).trim() || defaultSiteSettings.maintenanceMessage
+    };
+  }
+
+  function applySiteSettings(settings) {
+    const normalized = normalizeSiteSettings(settings);
+
+    if (maintenanceMessage) {
+      maintenanceMessage.textContent = normalized.maintenanceMessage;
+    }
+
+    document.body.classList.toggle("site-maintenance-active", normalized.maintenanceMode);
+
+    if (maintenanceScreen) {
+      maintenanceScreen.setAttribute("aria-hidden", normalized.maintenanceMode ? "false" : "true");
+    }
+  }
+
+  function parsePriceValue(value) {
+    const raw = String(value || "").trim();
+
+    if (!raw) {
+      return 0;
+    }
+
+    let normalized = raw.replace(/[^\d,.-]/g, "");
+
+    if (normalized.includes(",") && normalized.includes(".")) {
+      if (normalized.lastIndexOf(",") > normalized.lastIndexOf(".")) {
+        normalized = normalized.replace(/\./g, "").replace(",", ".");
+      } else {
+        normalized = normalized.replace(/,/g, "");
+      }
+    } else if (normalized.includes(",")) {
+      normalized = normalized.replace(/\./g, "").replace(",", ".");
+    } else {
+      normalized = normalized.replace(/,/g, "");
+    }
+
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function formatCurrency(value) {
+    const amount = Number(value);
+    const normalizedAmount = Number.isFinite(amount) ? amount : 0;
+
+    return new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "EUR"
+    }).format(normalizedAmount);
+  }
+
+  function normalizeMenuPeriods(value) {
+    const rawValues = Array.isArray(value)
+      ? value
+      : typeof value === "string"
+        ? String(value).replace(/^\{|\}$/g, "").split(",")
+        : [value];
+
+    const uniqueValues = Array.from(new Set(
+      rawValues
+        .map(function (item) {
+          return String(item || "").trim().toLowerCase();
+        })
+        .filter(function (item) {
+          return ["all_day", "breakfast", "lunch", "dinner"].includes(item);
+        })
+    ));
+
+    if (!uniqueValues.length || uniqueValues.includes("all_day")) {
+      return ["all_day"];
+    }
+
+    return ["breakfast", "lunch", "dinner"].filter(function (item) {
+      return uniqueValues.includes(item);
+    });
+  }
+
+  function getBerlinMinutesOfDay() {
+    const formatter = new Intl.DateTimeFormat("de-DE", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Europe/Berlin"
+    });
+    const parts = formatter.formatToParts(new Date());
+    const hour = Number(parts.find(function (part) {
+      return part.type === "hour";
+    })?.value || 0);
+    const minute = Number(parts.find(function (part) {
+      return part.type === "minute";
+    })?.value || 0);
+    return (hour * 60) + minute;
+  }
+
+  function getActiveScheduledMenuPeriod() {
+    const currentMinutes = getBerlinMinutesOfDay();
+
+    return scheduledMenuPeriods.find(function (key) {
+      const period = menuPeriods[key];
+      return currentMinutes >= period.startMinutes && currentMinutes < period.endMinutes;
+    }) || null;
+  }
+
+  function filterMenuItemsByCurrentTime(items) {
+    const activePeriodKey = getActiveScheduledMenuPeriod();
+
+    return items.filter(function (item) {
+      const periods = normalizeMenuPeriods(item.menuPeriods || item.menuPeriod);
+      return periods.includes("all_day") || (Boolean(activePeriodKey) && periods.includes(activePeriodKey));
+    });
+  }
+
+  function resolvePublicUrl(value) {
+    const raw = String(value || "").trim();
+
+    if (!raw) {
+      return "";
+    }
+
+    try {
+      const url = new URL(raw, window.location.href);
+
+      if (url.protocol === "http:" || url.protocol === "https:") {
+        return url.href;
+      }
+    } catch (error) {
+      return "";
+    }
+
+    return "";
+  }
+
+  function setStatusMessage(element, message, tone, baseClass) {
+    if (!element) {
+      return;
+    }
+
+    element.className = baseClass || "status";
+
+    if (tone) {
+      element.classList.add(tone);
+    }
+
+    element.textContent = message;
+  }
+
+  function setCatalogStatus(message, tone) {
+    setStatusMessage(catalogStatus, message, tone, "status");
+  }
+
+  function setOrderStatus(message, tone) {
+    setStatusMessage(orderStatus, message, tone, "status order-status");
+  }
+
+  function normalizeCatalogItem(item, forcedType) {
+    const itemType = forcedType || String(item && (item.itemType || item.type) ? item.itemType || item.type : "").trim().toLowerCase();
+    const normalizedPeriods = normalizeMenuPeriods(item && (item.menuPeriods || item.menuPeriod));
+    const title = String(item && item.title ? item.title : "").trim();
+    const description = String(item && item.description ? item.description : "").trim();
+    const priceText = String(item && (item.priceText || item.price) ? item.priceText || item.price : "").trim();
+    const priceValue = Number.isFinite(Number(item && item.priceValue)) ? Number(item.priceValue) : parsePriceValue(priceText);
+
+    return {
+      id: String(item && item.id ? item.id : title).trim(),
+      title,
+      description: description || "Keine Beschreibung hinterlegt.",
+      imageUrl: String(item && item.imageUrl ? item.imageUrl : "").trim(),
+      category: String(item && item.category ? item.category : "").trim(),
+      badge: String(item && item.badge ? item.badge : "").trim(),
+      priceText: priceText || (priceValue ? formatCurrency(priceValue) : ""),
+      priceValue,
+      itemType: itemType === "drink" ? "drink" : "food",
+      menuPeriod: normalizedPeriods[0] || "all_day",
+      menuPeriods: normalizedPeriods,
+      ctaLabel: String(item && item.ctaLabel ? item.ctaLabel : "").trim(),
+      ctaUrl: String(item && item.ctaUrl ? item.ctaUrl : "").trim(),
+      sortOrder: Number.isFinite(Number(item && item.sortOrder)) ? Number(item.sortOrder) : 0
+    };
+  }
+
+  function compareCatalogItems(a, b) {
+    return Number(a.sortOrder || 0) - Number(b.sortOrder || 0) || String(a.title || "").localeCompare(String(b.title || ""), "de");
+  }
+
+  function normalizeCatalogItems(items, forcedType) {
+    return (Array.isArray(items) ? items : [])
+      .map(function (item) {
+        return normalizeCatalogItem(item, forcedType);
+      })
+      .filter(function (item) {
+        return Boolean(item.title);
+      })
+      .sort(compareCatalogItems);
+  }
+
+  function getItemLabel(item) {
+    return item.itemType === "drink" ? "Getränk" : "Speise";
+  }
+
+  function createTag(label, muted) {
+    const tag = document.createElement("span");
+    tag.className = "tag" + (muted ? " is-muted" : "");
+    tag.textContent = label;
+    return tag;
+  }
+
+  function getCatalogItem(itemId) {
+    return foodItems.concat(drinkItems).find(function (item) {
+      return String(item.id) === String(itemId);
+    }) || null;
+  }
+
+  function getCartItem(itemId) {
+    return cart.get(String(itemId)) || null;
+  }
+
+  function getCartSummary() {
+    return Array.from(cart.values()).reduce(function (summary, item) {
+      summary.itemCount += Number(item.quantity || 0);
+      summary.totalValue += Number(item.lineTotalValue || 0);
+      return summary;
+    }, {
+      itemCount: 0,
+      totalValue: 0
+    });
+  }
+
+  function updateSummary() {
+    const summary = getCartSummary();
+    orderCount.textContent = String(summary.itemCount);
+    orderTotal.textContent = formatCurrency(summary.totalValue);
+  }
+
+  function addToCart(item) {
+    if (!item) {
+      return;
+    }
+
+    const current = getCartItem(item.id);
+    const quantity = current ? Number(current.quantity || 0) + 1 : 1;
+    const priceValue = Number(item.priceValue || 0);
+    const lineTotalValue = priceValue * quantity;
+
+    cart.set(String(item.id), {
+      id: String(item.id),
+      title: item.title,
+      description: item.description,
+      itemType: item.itemType,
+      category: item.category,
+      badge: item.badge,
+      quantity,
+      priceText: item.priceText || formatCurrency(priceValue),
+      priceValue,
+      lineTotalText: formatCurrency(lineTotalValue),
+      lineTotalValue,
+      imageUrl: item.imageUrl
+    });
+
+    renderCart();
+  }
+
+  function increaseCartItem(itemId) {
+    const current = getCartItem(itemId);
+
+    if (!current) {
+      return;
+    }
+
+    const catalogItem = getCatalogItem(itemId);
+    if (!catalogItem) {
+      return;
+    }
+
+    addToCart(catalogItem);
+  }
+
+  function decreaseCartItem(itemId) {
+    const current = getCartItem(itemId);
+
+    if (!current) {
+      return;
+    }
+
+    const nextQuantity = Number(current.quantity || 0) - 1;
+
+    if (nextQuantity <= 0) {
+      cart.delete(String(itemId));
+    } else {
+      const priceValue = Number(current.priceValue || 0);
+      current.quantity = nextQuantity;
+      current.lineTotalValue = priceValue * nextQuantity;
+      current.lineTotalText = formatCurrency(current.lineTotalValue);
+      cart.set(String(itemId), current);
+    }
+
+    renderCart();
+  }
+
+  function removeCartItem(itemId) {
+    cart.delete(String(itemId));
+    renderCart();
+  }
+
+  function clearCart() {
+    cart.clear();
+    renderCart();
+  }
+
+  function createCatalogCard(item) {
+    const article = document.createElement("article");
+    article.className = "card catalog-card";
+
+    const imageUrl = resolvePublicUrl(item.imageUrl);
+
+    if (imageUrl) {
+      const image = document.createElement("img");
+      image.src = imageUrl;
+      image.alt = item.title || "Menü-Eintrag";
+      article.appendChild(image);
+    }
+
+    const body = document.createElement("div");
+    body.className = "menu-card-body";
+
+    const header = document.createElement("div");
+    header.className = "menu-card-header";
+
+    const titleWrap = document.createElement("div");
+    const title = document.createElement("h3");
+    title.className = "menu-card-title";
+    title.textContent = item.title || "Ohne Titel";
+    titleWrap.appendChild(title);
+
+    const typeTag = createTag(getItemLabel(item), false);
+    typeTag.style.marginTop = "8px";
+    titleWrap.appendChild(typeTag);
+    header.appendChild(titleWrap);
+
+    if (item.priceText) {
+      const price = document.createElement("span");
+      price.className = "menu-card-price";
+      price.textContent = item.priceText;
+      header.appendChild(price);
+    }
+
+    body.appendChild(header);
+
+    if (item.category || item.badge) {
+      const tags = document.createElement("div");
+      tags.className = "menu-card-tags";
+
+      if (item.category) {
+        tags.appendChild(createTag(item.category, false));
+      }
+
+      if (item.badge) {
+        tags.appendChild(createTag(item.badge, false));
+      }
+
+      body.appendChild(tags);
+    }
+
+    const description = document.createElement("p");
+    description.className = "menu-card-description";
+    description.textContent = item.description;
+    body.appendChild(description);
+
+    const actions = document.createElement("div");
+    actions.className = "catalog-card-actions";
+
+    const addButton = document.createElement("button");
+    addButton.type = "button";
+    addButton.className = "btn small-btn";
+    addButton.dataset.action = "add";
+    addButton.dataset.id = item.id;
+    addButton.textContent = getCartItem(item.id) ? "Noch eins" : "In den Warenkorb";
+    actions.appendChild(addButton);
+
+    const quantity = getCartItem(item.id);
+    if (quantity) {
+      actions.appendChild(createTag(quantity.quantity + " im Warenkorb", true));
+    }
+
+    body.appendChild(actions);
+    article.appendChild(body);
+    return article;
+  }
+
+  function renderCatalogGroup(container, items, emptyMessage) {
+    if (!container) {
+      return;
+    }
+
+    const visibleItems = filterMenuItemsByCurrentTime(items);
+    container.replaceChildren();
+
+    if (!visibleItems.length) {
+      const emptyBox = document.createElement("div");
+      emptyBox.className = "order-empty";
+      emptyBox.textContent = emptyMessage;
+      container.appendChild(emptyBox);
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    visibleItems.forEach(function (item) {
+      fragment.appendChild(createCatalogCard(item));
+    });
+
+    container.appendChild(fragment);
+  }
+
+  function renderCatalog() {
+    foodCount.textContent = foodItems.length + " Artikel";
+    drinkCount.textContent = drinkItems.length + " Artikel";
+    renderCatalogGroup(foodCatalog, foodItems, "Zurzeit sind keine Speisen verfügbar.");
+    renderCatalogGroup(drinkCatalog, drinkItems, "Zurzeit sind keine Getränke verfügbar.");
+  }
+
+  function renderCartItem(item) {
+    const article = document.createElement("article");
+    article.className = "cart-item";
+
+    const top = document.createElement("div");
+    top.className = "cart-item-top";
+
+    const titleWrap = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = item.title;
+    titleWrap.appendChild(title);
+
+    const meta = document.createElement("p");
+    meta.className = "cart-item-meta";
+    meta.textContent = [
+      item.itemType === "drink" ? "Getränk" : "Speise",
+      item.category,
+      item.quantity + " x " + (item.priceText || formatCurrency(item.priceValue))
+    ].filter(Boolean).join(" · ");
+    titleWrap.appendChild(meta);
+
+    top.appendChild(titleWrap);
+
+    const total = document.createElement("strong");
+    total.textContent = item.lineTotalText || formatCurrency(item.lineTotalValue);
+    top.appendChild(total);
+    article.appendChild(top);
+
+    const actions = document.createElement("div");
+    actions.className = "cart-item-actions";
+
+    const quantityControl = document.createElement("div");
+    quantityControl.className = "quantity-control";
+
+    const decreaseButton = document.createElement("button");
+    decreaseButton.type = "button";
+    decreaseButton.className = "ghost-btn small-btn quantity-button";
+    decreaseButton.dataset.action = "decrease";
+    decreaseButton.dataset.id = item.id;
+    decreaseButton.textContent = "−";
+
+    const quantityValue = document.createElement("span");
+    quantityValue.className = "quantity-value";
+    quantityValue.textContent = String(item.quantity);
+
+    const increaseButton = document.createElement("button");
+    increaseButton.type = "button";
+    increaseButton.className = "ghost-btn small-btn quantity-button";
+    increaseButton.dataset.action = "increase";
+    increaseButton.dataset.id = item.id;
+    increaseButton.textContent = "+";
+
+    quantityControl.appendChild(decreaseButton);
+    quantityControl.appendChild(quantityValue);
+    quantityControl.appendChild(increaseButton);
+    actions.appendChild(quantityControl);
+
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.className = "ghost-btn small-btn";
+    removeButton.dataset.action = "remove";
+    removeButton.dataset.id = item.id;
+    removeButton.textContent = "Entfernen";
+    actions.appendChild(removeButton);
+
+    article.appendChild(actions);
+    return article;
+  }
+
+  function renderCart() {
+    cartList.replaceChildren();
+
+    if (!cart.size) {
+      const emptyBox = document.createElement("div");
+      emptyBox.className = "order-empty";
+      emptyBox.textContent = "Noch keine Positionen im Warenkorb.";
+      cartList.appendChild(emptyBox);
+      updateSummary();
+      renderCatalog();
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    Array.from(cart.values())
+      .sort(function (a, b) {
+        return String(a.title || "").localeCompare(String(b.title || ""), "de");
+      })
+      .forEach(function (item) {
+        fragment.appendChild(renderCartItem(item));
+      });
+
+    cartList.appendChild(fragment);
+    updateSummary();
+    renderCatalog();
+  }
+
+  function serializeOrderItems() {
+    return Array.from(cart.values()).map(function (item) {
+      return {
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        itemType: item.itemType,
+        category: item.category,
+        badge: item.badge,
+        quantity: Number(item.quantity || 0),
+        priceText: item.priceText || formatCurrency(item.priceValue),
+        priceValue: Number(item.priceValue || 0),
+        lineTotalText: item.lineTotalText || formatCurrency(item.lineTotalValue),
+        lineTotalValue: Number(item.lineTotalValue || 0)
+      };
+    });
+  }
+
+  async function requestJson(path, options) {
+    const method = options && options.method ? options.method : "GET";
+    const payload = options ? options.payload : undefined;
+    const response = await fetch(normalizeApiBaseUrl() + path, {
+      method,
+      headers: payload !== undefined ? {
+        "Content-Type": "application/json"
+      } : undefined,
+      body: payload !== undefined ? JSON.stringify(payload) : undefined,
+      cache: options && options.cache ? options.cache : "no-store"
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Request failed");
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    return contentType.includes("application/json") ? response.json() : null;
+  }
+
+  async function loadSiteSettings() {
+    if (!menuApiConfigured()) {
+      applySiteSettings(defaultSiteSettings);
+      return defaultSiteSettings;
+    }
+
+    try {
+      const result = await requestJson("/site-settings", {
+        cache: "no-store"
+      });
+
+      const settings = normalizeSiteSettings(result && result.settings ? result.settings : defaultSiteSettings);
+      applySiteSettings(settings);
+      return settings;
+    } catch (error) {
+      console.log(error);
+      applySiteSettings(defaultSiteSettings);
+      return defaultSiteSettings;
+    }
+  }
+
+  async function loadCatalog() {
+    if (!menuApiConfigured()) {
+      foodItems = defaultFoodItems.slice();
+      drinkItems = defaultDrinkItems.slice();
+      renderCatalog();
+      setCatalogStatus("Backend noch nicht verbunden. Demo-Karte angezeigt.", "warning");
+      return;
+    }
+
+    setCatalogStatus("Karte wird geladen ...", "");
+
+    const [foodResult, drinkResult] = await Promise.allSettled([
+      requestJson("/menu", { cache: "no-store" }),
+      requestJson("/drinks", { cache: "no-store" })
+    ]);
+
+    if (foodResult.status === "fulfilled") {
+      foodItems = normalizeCatalogItems(foodResult.value && foodResult.value.items ? foodResult.value.items : [], "food");
+    } else {
+      console.log(foodResult.reason);
+      foodItems = defaultFoodItems.slice();
+    }
+
+    if (drinkResult.status === "fulfilled") {
+      drinkItems = normalizeCatalogItems(drinkResult.value && drinkResult.value.items ? drinkResult.value.items : [], "drink");
+    } else {
+      console.log(drinkResult.reason);
+      drinkItems = defaultDrinkItems.slice();
+    }
+
+    renderCatalog();
+
+    if (foodResult.status !== "fulfilled" || drinkResult.status !== "fulfilled") {
+      setCatalogStatus("Backend teilweise nicht erreichbar. Nicht geladene Bereiche zeigen Demo-Daten.", "warning");
+      return;
+    }
+
+    if (!foodItems.length && !drinkItems.length) {
+      setCatalogStatus("Zurzeit sind noch keine Einträge im Backend angelegt.", "warning");
+      return;
+    }
+
+    setCatalogStatus("Karte geladen.", "success");
+  }
+
+  async function submitOrder(event) {
+    event.preventDefault();
+
+    if (!menuApiConfigured()) {
+      setOrderStatus("Das Backend ist noch nicht verbunden.", "error");
+      return;
+    }
+
+    if (!cart.size) {
+      setOrderStatus("Bitte lege zuerst mindestens eine Position in den Warenkorb.", "warning");
+      return;
+    }
+
+    const formData = new FormData(orderForm);
+    const customerName = String(formData.get("customer_name") || "").trim();
+    const customerContact = String(formData.get("customer_contact") || "").trim();
+    const pickupTime = String(formData.get("pickup_time") || "").trim();
+    const notes = String(formData.get("notes") || "").trim();
+    const summary = getCartSummary();
+
+    if (!customerName || !customerContact) {
+      setOrderStatus("Bitte trage Name und Kontakt ein.", "warning");
+      return;
+    }
+
+    const payload = {
+      customerName,
+      customerContact,
+      pickupTime,
+      notes,
+      sourcePage: window.location.pathname,
+      totalText: formatCurrency(summary.totalValue),
+      totalValue: summary.totalValue,
+      items: serializeOrderItems(),
+      customer_name: customerName,
+      customer_contact: customerContact,
+      pickup_time: pickupTime,
+      total_text: formatCurrency(summary.totalValue),
+      total_value: summary.totalValue
+    };
+
+    setOrderStatus("Bestellung wird gesendet ...", "");
+
+    try {
+      await requestJson("/orders", {
+        method: "POST",
+        payload
+      });
+
+      setOrderStatus("Bestellung erfolgreich gespeichert.", "success");
+      orderForm.reset();
+      clearCart();
+    } catch (error) {
+      console.log(error);
+      setOrderStatus("Bestellung konnte nicht gespeichert werden. Bitte prüfe das Backend.", "error");
+    }
+  }
+
+  foodCatalog.addEventListener("click", function (event) {
+    const button = event.target.closest("button[data-action='add']");
+
+    if (!button) {
+      return;
+    }
+
+    const item = getCatalogItem(button.dataset.id);
+
+    if (!item) {
+      return;
+    }
+
+    addToCart(item);
+  });
+
+  drinkCatalog.addEventListener("click", function (event) {
+    const button = event.target.closest("button[data-action='add']");
+
+    if (!button) {
+      return;
+    }
+
+    const item = getCatalogItem(button.dataset.id);
+
+    if (!item) {
+      return;
+    }
+
+    addToCart(item);
+  });
+
+  cartList.addEventListener("click", function (event) {
+    const button = event.target.closest("button[data-action]");
+
+    if (!button) {
+      return;
+    }
+
+    const action = button.dataset.action;
+    const itemId = button.dataset.id;
+
+    if (action === "increase") {
+      increaseCartItem(itemId);
+      return;
+    }
+
+    if (action === "decrease") {
+      decreaseCartItem(itemId);
+      return;
+    }
+
+    if (action === "remove") {
+      removeCartItem(itemId);
+    }
+  });
+
+  clearCartButton.addEventListener("click", function () {
+    clearCart();
+    setOrderStatus("", "");
+  });
+
+  orderForm.addEventListener("submit", submitOrder);
+
+  themeToggle.addEventListener("click", function () {
+    const nextTheme = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    localStorage.setItem(storageKey, nextTheme);
+    applyTheme(nextTheme);
+  });
+
+  function handleSystemThemeChange() {
+    if (!isDesktopDevice() || !localStorage.getItem(storageKey)) {
+      applyTheme(getSystemTheme());
+    }
+  }
+
+  if (typeof prefersDark.addEventListener === "function") {
+    prefersDark.addEventListener("change", handleSystemThemeChange);
+  } else if (typeof prefersDark.addListener === "function") {
+    prefersDark.addListener(handleSystemThemeChange);
+  }
+
+  window.addEventListener("resize", syncThemeWithDevice);
+  syncThemeWithDevice();
+  applySiteSettings(defaultSiteSettings);
+  renderCart();
+  loadSiteSettings();
+  loadCatalog();
+</script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Winkelwerk Poster & Sticker">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#2b2b2b">
+  <meta name="color-scheme" content="light dark">
+  <title>Winkelwerk Poster & Sticker</title>
+  <link rel="icon" type="image/png" href="../winkelwerlk.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script src="../app-config.js"></script>
+  <script src="../script.js" defer></script>
+  <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+  <div class="maintenance-screen" id="maintenanceScreen" aria-live="polite">
+    <div class="maintenance-card">
+      <img src="../winkelwerlk.png" alt="Winkelwerk">
+      <p class="maintenance-kicker">Bitte etwas Geduld</p>
+      <h2>Website wird gerade bearbeitet</h2>
+      <p id="maintenanceMessage">Bitte später erneut versuchen.</p>
+    </div>
+  </div>
+
+  <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Zum Dunkelmodus wechseln">Dunkelmodus</button>
+
+  <nav id="sideMenu">
+    <a href="../" onclick="toggleMenu()">Startseite</a>
+    <a href="../men%C3%BC/" onclick="toggleMenu()">Men&uuml;</a>
+    <a href="../getr%C3%A4nke/" onclick="toggleMenu()">Getr&auml;nke</a>
+    <a href="../bestellen/" onclick="toggleMenu()">Bestellen</a>
+    <a href="./" onclick="toggleMenu()">Poster &amp; Sticker</a>
+    <a href="../sticker/" onclick="toggleMenu()">Sticker</a>
+    <a href="../#about" onclick="toggleMenu()">&Uuml;ber uns</a>
+    <a href="../#contact" onclick="toggleMenu()">Kontakt</a>
+    <a href="../#location" onclick="toggleMenu()">Standort</a>
+    <a href="../inbox/" onclick="toggleMenu()">Postfach</a>
+  </nav>
+
+  <header>
+    <div class="hero-content">
+      <p class="page-eyebrow">Winkelwerk Shop</p>
+      <h1>Poster &amp; Sticker</h1>
+      <p>Entdecke unsere Motive als hochwertige Poster und Sticker. Neue Designs werden direkt aus dem Mitarbeiter- oder Adminbereich veröffentlicht.</p>
+      <div class="hero-actions">
+        <a class="btn" href="#produkte">Motive entdecken</a>
+        <a class="ghost-btn" href="../">Zur Startseite</a>
+      </div>
+    </div>
+  </header>
+
+  <section id="produkte">
+    <h2>Unsere Motive</h2>
+    <p class="menu-copy">Alle Poster und Sticker, die aktuell verfügbar sind. Für weitere Informationen oder eine Bestellung wähle den jeweiligen Button.</p>
+    <div class="menu" id="printProductGrid" aria-live="polite"></div>
+    <p class="menu-state is-hidden" id="printProductState"></p>
+  </section>
+
+  <footer>
+    <div class="footer-row">
+      <p>&copy; 2026 Winkelwerk</p>
+      <a class="footer-admin-link" href="../mitarbeiter/">Mitarbeiterportal</a>
+      <a class="footer-admin-link" href="../admin/">Admin</a>
+    </div>
+  </footer>
+
+  <script>
+    const root = document.documentElement;
+    const appConfig = window.WINKELWERK_APP_CONFIG || {};
+    const themeToggle = document.getElementById("themeToggle");
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    const storageKey = "winkelwerk-desktop-theme";
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+    const productGrid = document.getElementById("printProductGrid");
+    const productState = document.getElementById("printProductState");
+    const maintenanceScreen = document.getElementById("maintenanceScreen");
+    const maintenanceMessage = document.getElementById("maintenanceMessage");
+    const defaultSiteSettings = {
+      maintenanceMode: false,
+      maintenanceMessage: "Website wird gerade bearbeitet. Bitte später erneut versuchen."
+    };
+
+    function isDesktopDevice() {
+      return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    }
+
+    function getSystemTheme() {
+      return prefersDark.matches ? "dark" : "light";
+    }
+
+    function applyTheme(theme) {
+      const nextModeLabel = theme === "dark" ? "Hellmodus" : "Dunkelmodus";
+      root.setAttribute("data-theme", theme);
+
+      if (themeMeta) {
+        themeMeta.setAttribute("content", theme === "dark" ? "#0f1013" : "#fffaf4");
+      }
+
+      if (themeToggle) {
+        themeToggle.textContent = nextModeLabel;
+        themeToggle.setAttribute("aria-label", "Zum " + nextModeLabel + " wechseln");
+      }
+    }
+
+    function syncThemeWithDevice() {
+      const savedTheme = localStorage.getItem(storageKey);
+      applyTheme(isDesktopDevice() ? (savedTheme || getSystemTheme()) : getSystemTheme());
+    }
+
+    function getApiBaseUrl() {
+      return String(appConfig.pushFunctionUrl || appConfig.pushApiBaseUrl || "").replace(/\/+$/, "");
+    }
+
+    function apiConfigured() {
+      return Boolean(getApiBaseUrl());
+    }
+
+    function normalizeSiteSettings(settings) {
+      return {
+        maintenanceMode: Boolean(settings && settings.maintenanceMode),
+        maintenanceMessage: String(settings && settings.maintenanceMessage ? settings.maintenanceMessage : defaultSiteSettings.maintenanceMessage).trim()
+          || defaultSiteSettings.maintenanceMessage
+      };
+    }
+
+    function applySiteSettings(settings) {
+      const normalized = normalizeSiteSettings(settings);
+
+      if (maintenanceMessage) {
+        maintenanceMessage.textContent = normalized.maintenanceMessage;
+      }
+
+      document.body.classList.toggle("site-maintenance-active", normalized.maintenanceMode);
+
+      if (maintenanceScreen) {
+        maintenanceScreen.setAttribute("aria-hidden", normalized.maintenanceMode ? "false" : "true");
+      }
+    }
+
+    function normalizePrintProduct(item) {
+      const itemType = String(item && (item.itemType || item.type) ? item.itemType || item.type : "").trim().toLowerCase();
+
+      return {
+        title: String(item && item.title ? item.title : "").trim(),
+        description: String(item && item.description ? item.description : "").trim(),
+        imageUrl: String(item && item.imageUrl ? item.imageUrl : "").trim(),
+        category: String(item && item.category ? item.category : "").trim(),
+        badge: String(item && item.badge ? item.badge : "").trim(),
+        price: String(item && item.price ? item.price : "").trim(),
+        ctaLabel: String(item && item.ctaLabel ? item.ctaLabel : "").trim(),
+        ctaUrl: String(item && item.ctaUrl ? item.ctaUrl : "").trim(),
+        itemType: itemType === "sticker" ? "sticker" : "poster"
+      };
+    }
+
+    function resolvePublicUrl(value) {
+      const raw = String(value || "").trim();
+
+      if (!raw) {
+        return "";
+      }
+
+      try {
+        const url = new URL(raw, window.location.href);
+        return url.protocol === "http:" || url.protocol === "https:" ? url.href : "";
+      } catch (error) {
+        return "";
+      }
+    }
+
+    function setProductState(message, hidden) {
+      productState.textContent = message;
+      productState.classList.toggle("is-hidden", Boolean(hidden));
+    }
+
+    function createTag(label) {
+      const tag = document.createElement("span");
+      tag.className = "menu-card-tag";
+      tag.textContent = label;
+      return tag;
+    }
+
+    function createProductCard(item) {
+      const article = document.createElement("article");
+      article.className = "card menu-card";
+
+      const imageUrl = resolvePublicUrl(item.imageUrl);
+
+      if (imageUrl) {
+        const image = document.createElement("img");
+        image.src = imageUrl;
+        image.alt = item.title || (item.itemType === "sticker" ? "Sticker" : "Poster");
+        image.loading = "lazy";
+        article.appendChild(image);
+      }
+
+      const body = document.createElement("div");
+      body.className = "menu-card-body";
+
+      const header = document.createElement("div");
+      header.className = "menu-card-header";
+
+      const title = document.createElement("h3");
+      title.className = "menu-card-title";
+      title.textContent = item.title || "Ohne Titel";
+      header.appendChild(title);
+
+      if (item.price) {
+        const price = document.createElement("span");
+        price.className = "menu-card-price";
+        price.textContent = item.price;
+        header.appendChild(price);
+      }
+
+      body.appendChild(header);
+
+      const tags = document.createElement("div");
+      tags.className = "menu-card-tags";
+      tags.appendChild(createTag(item.itemType === "sticker" ? "Sticker" : "Poster"));
+
+      if (item.category) {
+        tags.appendChild(createTag(item.category));
+      }
+
+      if (item.badge) {
+        tags.appendChild(createTag(item.badge));
+      }
+
+      body.appendChild(tags);
+
+      const description = document.createElement("p");
+      description.className = "menu-card-description";
+      description.textContent = item.description;
+      body.appendChild(description);
+
+      const ctaUrl = resolvePublicUrl(item.ctaUrl);
+
+      if (item.ctaLabel && ctaUrl) {
+        const link = document.createElement("a");
+        link.className = "menu-card-link";
+        link.href = ctaUrl;
+        link.textContent = item.ctaLabel;
+        body.appendChild(link);
+      }
+
+      article.appendChild(body);
+      return article;
+    }
+
+    function renderProducts(items) {
+      const products = (Array.isArray(items) ? items : [])
+        .map(normalizePrintProduct)
+        .filter(function (item) {
+          return item.title && item.description;
+        });
+
+      productGrid.replaceChildren();
+
+      if (!products.length) {
+        setProductState("Noch keine Poster oder Sticker veröffentlicht. Neue Motive können im Mitarbeiter- oder Adminbereich angelegt werden.", false);
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      products.forEach(function (item) {
+        fragment.appendChild(createProductCard(item));
+      });
+
+      productGrid.appendChild(fragment);
+      setProductState("", true);
+    }
+
+    async function loadSiteSettings() {
+      if (!apiConfigured()) {
+        applySiteSettings(defaultSiteSettings);
+        return;
+      }
+
+      try {
+        const response = await fetch(getApiBaseUrl() + "/site-settings", { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error("Site settings request failed");
+        }
+
+        const result = await response.json();
+        applySiteSettings(result && result.settings ? result.settings : defaultSiteSettings);
+      } catch (error) {
+        console.log(error);
+        applySiteSettings(defaultSiteSettings);
+      }
+    }
+
+    async function loadProducts() {
+      if (!apiConfigured()) {
+        renderProducts([]);
+        return;
+      }
+
+      try {
+        const response = await fetch(getApiBaseUrl() + "/print-products", { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error("Print product request failed");
+        }
+
+        const result = await response.json();
+        renderProducts(Array.isArray(result && result.items) ? result.items : []);
+      } catch (error) {
+        console.log(error);
+        setProductState("Die Poster und Sticker konnten gerade nicht geladen werden. Bitte später erneut versuchen.", false);
+      }
+    }
+
+    themeToggle.addEventListener("click", function () {
+      if (!isDesktopDevice()) {
+        return;
+      }
+
+      const nextTheme = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      localStorage.setItem(storageKey, nextTheme);
+      applyTheme(nextTheme);
+    });
+
+    function handleSystemThemeChange() {
+      if (!isDesktopDevice()) {
+        applyTheme(getSystemTheme());
+      }
+    }
+
+    if (typeof prefersDark.addEventListener === "function") {
+      prefersDark.addEventListener("change", handleSystemThemeChange);
+    } else if (typeof prefersDark.addListener === "function") {
+      prefersDark.addListener(handleSystemThemeChange);
+    }
+
+    window.addEventListener("resize", syncThemeWithDevice);
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("../service-worker.js", { scope: "../" }).catch(function (error) {
+        console.log(error);
+      });
+    }
+
+    syncThemeWithDevice();
+    loadSiteSettings();
+    loadProducts();
+  </script>
+</body>
+</html>

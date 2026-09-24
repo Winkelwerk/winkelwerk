@@ -1524,9 +1524,13 @@ body.site-maintenance-active .maintenance-screen {
     grid-template-columns: 1fr;
   }
 
-  .menu-card img {
-    height: 210px;
-  }
+.menu-card img {
+  width: 100%;
+  aspect-ratio: 16 / 9; /* Oder 4/3 für etwas mehr Höhe */
+  object-fit: cover;
+  border-radius: 28px 28px 0 0;
+  display: block;
+}
 
   footer {
     width: min(100% - 16px, 1160px);

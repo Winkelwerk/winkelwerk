@@ -694,12 +694,10 @@ section > p {
 
 .menu-card img {
   width: 100%;
-  height: auto;
-  max-height: 600px;
-  object-fit: contain;
+  height: 230px;
+  object-fit: cover;
   margin-bottom: 0;
-  border-radius: 28px 28px 0 0;
-  background: #11151b;
+  border-radius: 0;
 }
 
 .menu-card-body {
